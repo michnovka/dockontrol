@@ -1,0 +1,3 @@
+[submodule "openwebnet-php"]
+	path = openwebnet-php
+	url = https://github.com/michnovka/openwebnet-php.git

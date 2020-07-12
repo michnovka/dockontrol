@@ -180,9 +180,6 @@ $user = _get_user_array();
 $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions());
 
-if($_SESSION['id'] == 1)
-$smarty->display('index2.tpl');
-else
-$smarty->display('index2.tpl');
+$smarty->display('index.tpl');
 
 ?>

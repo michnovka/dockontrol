@@ -5,7 +5,7 @@
     var lastTimeout = null;
     var stopTimer = false;
 
-    function doAction(what, element, isInModal, repeatTimes){
+    function doAction(what, element, isInModal, repeatTimes, reSetUpHooks){
         var actionResultSelector = $('div#action_result');
 
         if(isInModal)
@@ -17,10 +17,13 @@
                 $(element).data('original', $(element).html());
                 $(element).data('originalDisabled' ,$(element).prop('disabled'));
                 $(element).data('originalId' ,$(element).attr('id'));
-                $(element).html('<div uk-spinner></div>').prop('disabled', true);
+                $(element).html('<div uk-spinner></div>').addClass('spinner').prop('disabled', true);
             }else{
                 $(element).html('Close garage').prop('disabled', false).attr('id', 'stopTimer');
             }
+
+
+            what = what.replace(/_options/g,'');
 
             $.post(window.location.self, { action : what, repeat_times: repeatTimes }, function(data){
                 $(actionResultSelector).find('p').text(data.message);
@@ -32,16 +35,6 @@
 
                     window.navigator.vibrate(100);
 
-                    if(stopTimer){
-                        data.repeat_times = 0;
-                        stopTimer = false;
-                    }
-
-                    if(data.repeat_times && data.repeat_times > 0){
-                        doNotHideActionResult = true;
-                        lastTimeout = setTimeout(function(){ console.log('repeating'); doAction(what, element, isInModal, data.repeat_times); }, data.repeat_miliseconds);
-                    }
-
                 }else{
                     $(actionResultSelector).removeClass('uk-alert-success').addClass('uk-alert-danger').show(200);
                 }
@@ -51,7 +44,11 @@
                     setTimeout(function(){ $(actionResultSelector).hide(200);}, 3000);
 
                     setTimeout(function(){
-                        $(element).html($(element).data('original')).prop('disabled', $(element).data('originalDisabled')).attr('id', $(element).data('originalId')).removeClass('success');
+                        $(element).removeClass('spinner').html($(element).data('original')).prop('disabled', $(element).data('originalDisabled')).attr('id', $(element).data('originalId')).removeClass('success');
+                        if(reSetUpHooks) {
+                            setUpHooks($(element).find('div.single_open'));
+                            setUpHooksCamera($(element).find('div.camera'));
+                        }
                     }, 2000);
 
                     $(element).html('<svg id="successAnimation" class="animated" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 70 70">' +
@@ -68,93 +65,123 @@
 
     var open_garage_gate_modal;
 
-    $(document).ready(function(){
 
-        {if $user.button_press_type == 'hold'}
+    var timeOut = null;
 
-            var timeOut = null;
+    var touchMoved = false;
 
-            var touchMoved = false;
+    var clicksWithoutAction = 0;
 
-            var clicksWithoutAction = 0;
+    function setUpHooksCamera(element){
 
-            $('button.clickable').on('mousedown touchstart', function(e) {
-                $(this).addClass('active');
+        $(element).click(function() {
 
-                touchMoved = false;
-
-                var this_object = this;
-                var this_id = $(this).attr('id');
-                console.log('clicked: '+this_id);
-
-                if(this_id == 'stopTimer')
-                    stopTimer = true;
-
-                var isInModal = $(this).hasClass('clickable_modal');
-
-                timeOut = setTimeout(function(){
-                    if(touchMoved != true || isInModal) {
-                        clicksWithoutAction = 0;
-                        console.log('held: ' + this_id);
-                        doAction(this_id, this_object, isInModal, 0);
-                    }
-                }, 200);
-
-            }).bind('mouseup mouseleave touchend', function() {
-                var this_id = $(this).attr('id');
-                console.log('held end: '+this_id);
-                $(this).removeClass('active');
-                clearInterval(timeOut);
-            }).bind('touchmove', function () {
-                var this_id = $(this).attr('id');
-                console.log('touch moved: '+this_id);
-                $(this).removeClass('active');
-                touchMoved = true;
-            }).bind('click', function () {
-                if(clicksWithoutAction++ > 3){
-                    window.alert('You have to press and hold the button, not just click.');
-                }
-                console.log('clicked (without action: ' + clicksWithoutAction + ')');
-            });
-
-        {else}
-
-            $('button.clickable').click(function(event){
-                var this_id = $(this).attr('id');
-                console.log('clicked: '+this_id);
-
-                if(this_id == 'stopTimer')
-                    stopTimer = true;
-
-                var isInModal = $(this).hasClass('clickable_modal');
-
-                doAction(this_id, this, isInModal, 0);
-            });
-
-        {/if}
-
-        open_garage_gate_modal = $('div#open_garage_gate_modal');
-
-        $('button.garage_gate_modal').click(function() {
-
-            var button_id = $(this).attr('id');
+            var button_element = $(this).parent();
+            var button_id = button_element.attr('id');
 
             var new_button_id = button_id.replace(/_options/g,'');
             var camera_id = new_button_id.replace(/open_/g,'');
 
-            $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button').attr('id', new_button_id);
-            $(open_garage_gate_modal).find('button.open_garage_gate_1min_dummy_button').attr('id', new_button_id+'_1min');
-            $(open_garage_gate_modal).find('h2#open_garage_gate_modal_title').text('Open ' + $(this).text());
-            $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture').attr('src', 'loading.jpg');
-            $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture').attr('src', 'camera.php?camera='+camera_id+'&now'+Date.now());
+            var picture_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture');
+            var picture2_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture2');
 
-            $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture2').attr('src', 'loading.jpg');
-            $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture2').attr('src', 'camera.php?camera='+camera_id+'_in&now'+Date.now());
+            $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button').attr('id', new_button_id);
+
+            var button_open_1min_element = $(open_garage_gate_modal).find('button.open_garage_gate_1min_dummy_button');
+
+            $(open_garage_gate_modal).find('h2#open_garage_gate_modal_title').text('Open ' + $(this).parent().find('div.single_open').text());
+
+            picture_element.attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera_id+'&now'+Date.now());
+
+            if(button_element.hasClass('entrance')){
+                picture2_element.hide();
+                button_open_1min_element.hide();
+            }else{
+                picture2_element.show().attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera_id+'_in&now'+Date.now());
+                button_open_1min_element.show().attr('id', new_button_id+'_1min');
+            }
+
 
             var modal = UIkit.modal(open_garage_gate_modal);
             modal.show();
 
         });
+    }
+
+    function setUpHooks(element){
+
+        console.log('setup hooks');
+        console.log(element);
+
+        $(element).on('mousedown touchstart', function(e) {
+
+            var this_object = this;
+
+            var reSetUpHooks = false;
+
+            if(this_object.tagName === 'DIV') {
+                this_object = $(this).parent();
+                reSetUpHooks = true;
+            }
+
+            console.log(this_object);
+
+            $(this_object).addClass('active');
+
+            touchMoved = false;
+
+            var this_id = $(this_object).attr('id');
+            console.log('clicked: '+this_id);
+
+            var isInModal = $(this_object).hasClass('clickable_modal');
+
+            timeOut = setTimeout(function(){
+                if(touchMoved !== true || isInModal) {
+                    clicksWithoutAction = 0;
+                    console.log('held: ' + this_id);
+                    doAction(this_id, this_object, isInModal, 0, reSetUpHooks);
+                }
+            }, 250);
+
+        }).bind('mouseup mouseleave touchend', function() {
+
+            var this_object = this;
+
+            if(this_object.tagName === 'DIV')
+                this_object = $(this).parent();
+
+            var this_id = $(this_object).attr('id');
+            console.log('held end: '+this_id);
+            $(this_object).removeClass('active');
+            clearInterval(timeOut);
+        }).bind('touchmove', function () {
+
+            var this_object = this;
+
+            if(this_object.tagName === 'DIV')
+                this_object = $(this).parent();
+
+            var this_id = $(this_object).attr('id');
+            console.log('touch moved: '+this_id);
+            $(this_object).removeClass('active');
+            touchMoved = true;
+        }).bind('click', function () {
+            if(++clicksWithoutAction > 2){
+                window.alert('You have to press and hold the button, not just click.');
+            }
+            console.log('clicked (without action: ' + clicksWithoutAction + ')');
+        });
+
+    }
+
+    $(document).ready(function(){
+
+
+        setUpHooks('button.clickable,button.garage_gate_modal div.single_open');
+
+        open_garage_gate_modal = $('div#open_garage_gate_modal');
+
+        setUpHooksCamera('button.garage_gate_modal div.camera');
 
         $('img#open_garage_gate_modal_camera_picture,img#open_garage_gate_modal_camera_picture2').click(function () {
             $(this).attr('src', $(this).attr('src')+'1');
@@ -202,45 +229,47 @@
         <div class="uk-width-1-1"><h4 class="uk-h4">Gates</h4></div>
 
         {if $permissions.gate}
-            <div class="uk-width-1-2@l"><button id="open_gate_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1">Gate</button></div>
+            <div class="uk-width-1-2@l"><button id="open_gate_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Gate</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.z9garage}
-            <div class="uk-width-1-2@l"><button id="open_garage_z9_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1">Garage Z9</button></div>
+            <div class="uk-width-1-2@l"><button id="open_garage_z9_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Garage Z9</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button>
+            </div>
         {/if}
 
+
         {if $permissions.z8garage}
-            <div class="uk-width-1-2@l"><button id="open_garage_z8_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1">Garage Z8</button></div>
+            <div class="uk-width-1-2@l"><button id="open_garage_z8_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Garage Z8</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
 
         {if $permissions.z7garage}
-        <div class="uk-width-1-2@l"><button id="open_garage_z7_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1">Garage Z7</button></div>
+        <div class="uk-width-1-2@l"><button id="open_garage_z7_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Garage Z7</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
 
         <div class="uk-width-1-1"><h4 class="uk-h4">Entrances</h4></div>
 
         {if $permissions.entrance_menclova}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_menclova" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_menclova">Menclova</button></div>
+        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_menclova_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_menclova_options"><div class="single_open">Menclova</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.entrance_smrckova}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_smrckova" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_smrckova">Smrckova</button></div>
+        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_smrckova_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_smrckova_options"><div class="single_open">Smrckova</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.z7b1}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z7b1" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_z7b1">Z7.B1 Entrance</button></div>
+            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z7b1_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z7b1_options"><div class="single_open">Z7.B1</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.z7b2}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z7b2" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_z7b2">Z7.B2 Entrance</button></div>
+            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z7b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z7b2_options"><div class="single_open">Z7.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.z8b1}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z8b1" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_z8b1">Z8.B1 Entrance</button></div>
+            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z8b1_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z8b1_options"><div class="single_open">Z8.B1</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.z8b2}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z8b2" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_z8b2">Z8.B2 Entrance</button></div>
+            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z8b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z8b2_options"><div class="single_open">Z8.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.z9b1}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b1" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_z9b1">Z9.B1 Entrance</button></div>
+            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b1_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z9b1_options"><div class="single_open">Z9.B1</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
         {if $permissions.z9b2}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b2" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="open_entrance_z9b2">Z9.B2 Entrance</button></div>
+            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z9b2_options"><div class="single_open">Z9.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
 
         {if $permissions.z9b2elevator}

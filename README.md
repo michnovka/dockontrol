@@ -12,4 +12,4 @@ This CP uses relays to send inputs to garage gates. I use Raspberry Pi4 together
 
 CP also communicates with Bticino door entry system using the Openwebnet protocol and using this gateway: https://catalogue.bticino.com/BTI-F454-EN
 
-Some peripherals are needed in other buildings which is accomplished using a network of other Raspberry PIs running the same Relay from Waveshare. Repo for software of these nodes will be published later.
+Some peripherals are needed in other buildings which is accomplished using a network of other Raspberry PIs running the same Relay from Waveshare. Repo for software of these nodes can be found here: https://github.com/michnovka/dockontrol-node

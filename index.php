@@ -80,12 +80,16 @@ if(!empty($_POST['action'])){
 			}
 			break;
 
+		case 'unlock_elevator_z9b1':
 		case 'unlock_elevator_z9b2':
+
+			preg_match('/^unlock_elevator_(z[0-9]b[0-9])$/', $_POST['action'], $m);
+
 			// elevator
-			if(!_check_permission('z9b2elevator')){
+			if(!_check_permission($m[1].'elevator')){
 				$message = 'Not authorized';
 			} else {
-				_add_to_action_queue('unlock_elevator_z9b2', $_SESSION['id'], time());
+				_add_to_action_queue('unlock_elevator_'.$m[1], $_SESSION['id'], time());
 				//sleep(1);
 				$message = 'Elevator unlocked';
 				$status = 'ok';

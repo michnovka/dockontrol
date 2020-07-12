@@ -272,10 +272,13 @@
             <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z9b2_options"><div class="single_open">Z9.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
 
-        {if $permissions.z9b2elevator}
-        <div class="uk-width-1-3@l"><button name="action" id="unlock_elevator_z9b2"type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_elevator_z9b2">Z9.B2 Elevator</button></div>
+        {if $permissions.z9b1elevator}
+            <div class="uk-width-1-3@l"><button name="action" id="unlock_elevator_z9b1"type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_elevator_z9b1">Z9.B1 Elevator</button></div>
         {/if}
 
+        {if $permissions.z9b2elevator}
+            <div class="uk-width-1-3@l"><button name="action" id="unlock_elevator_z9b2"type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_elevator_z9b2">Z9.B2 Elevator</button></div>
+        {/if}
 
     </div>
 

@@ -20,7 +20,9 @@ $actions_allowed = array(
 	'open_garage_z8',  'open_entrance_z8b1', 'open_entrance_z8b2',
 	'open_garage_z9',  'open_entrance_z9b1', 'open_entrance_z9b2',
 	'open_entrance_menclova', 'open_entrance_smrckova',
-	'unlock_elevator_z9b2'
+	'unlock_elevator_z7b1', 'unlock_elevator_z7b2',
+	'unlock_elevator_z8b1', 'unlock_elevator_z8b2',
+	'unlock_elevator_z9b1', 'unlock_elevator_z9b2',
 );
 
 if(!empty($argv[1])){
@@ -32,13 +34,13 @@ if(!empty($argv[1])){
 			$actions_allowed = array('open_entrance_menclova', 'open_entrance_smrckova',);
 			break;
 		case 'z7':
-			$actions_allowed = array('open_garage_z7', 'open_entrance_z7b1', 'open_entrance_z7b2',);
+			$actions_allowed = array('open_garage_z7', 'open_entrance_z7b1', 'open_entrance_z7b2', 'unlock_elevator_z7b1', 'unlock_elevator_z7b2', );
 			break;
 		case 'z8':
-			$actions_allowed = array('open_garage_z8', 'open_entrance_z8b1', 'open_entrance_z8b2',);
+			$actions_allowed = array('open_garage_z8', 'open_entrance_z8b1', 'open_entrance_z8b2', 'unlock_elevator_z8b1', 'unlock_elevator_z8b2', );
 			break;
 		case 'z9':
-			$actions_allowed = array('open_garage_z9', 'open_entrance_z9b1', 'open_entrance_z9b2', 'unlock_elevator_z9b2', );
+			$actions_allowed = array('open_garage_z9', 'open_entrance_z9b1', 'open_entrance_z9b2', 'unlock_elevator_z9b1', 'unlock_elevator_z9b2', );
 			break;
 	}
 }
@@ -78,6 +80,9 @@ while($minute_start == date('i')) {
 					break;
 				case 'unlock_elevator_z9b2':
 					DoAction(1, 'PULSE', 500000);
+					break;
+				case 'unlock_elevator_z9b1':
+					DoAction(4, 'PULSE', 500000);
 					break;
 
 				case 'open_entrance_z9b1':

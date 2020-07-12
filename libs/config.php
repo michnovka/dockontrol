@@ -52,6 +52,7 @@ function _get_permissions($user_id = null)
 		   MAX(g.z9b1) as z9b1,
 		   MAX(g.z9b2) as z9b2,
 		   MAX(g.z9b2elevator) as z9b2elevator,
+		   MAX(g.z9b1elevator) as z9b1elevator,
 		   MAX(g.z7garage) as z7garage,
 		   MAX(g.z8garage) as z8garage,
 		   MAX(g.z9garage) as z9garage,

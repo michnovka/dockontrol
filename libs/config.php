@@ -36,7 +36,7 @@ function _check_permission($permission)
 	return $_SESSION['permissions'][$permission] == 1;
 }
 
-function _get_permissions($user_id = null)
+function _get_permissions($user_id = null, $ignore_admin = true)
 {
 	global $db;
 
@@ -59,7 +59,10 @@ function _get_permissions($user_id = null)
 		   MAX(g.gate) as gate,
 		   MAX(g.entrance_menclova) as entrance_menclova,
 		   MAX(g.entrance_smrckova) as entrance_smrckova
-		FROM `groups` g INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=#', $user_id);
+		FROM `groups` g INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=#'.($ignore_admin ? ' AND g.id != 1' : ''), $user_id);
+
+	if($ignore_admin)
+		$_SESSION['permissions']['admin'] = $db->fetch('SELECT 1 FROM `groups` g INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=# AND g.id=1', $user_id);
 
 	return $_SESSION['permissions'];
 }

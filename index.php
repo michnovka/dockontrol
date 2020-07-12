@@ -188,7 +188,9 @@ _require_login();
 $user = _get_user_array();
 
 $smarty->assign('user', $user);
-$smarty->assign('permissions', _get_permissions());
+$smarty->assign('permissions', _get_permissions($_SESSION['id'], !array_key_exists('admin', $_GET)));
+
+$smarty->assign('admin_limited_view', !array_key_exists('admin', $_GET));
 
 $smarty->display('index.tpl');
 

@@ -82,9 +82,8 @@ while($minute_start == date('i')) {
 					DoAction(1, 'PULSE', 500000);
 					break;
 				case 'unlock_elevator_z9b1':
-					DoAction(4, 'PULSE', 500000);
+					DoAction(5, 'PULSE', 500000);
 					break;
-
 				case 'open_entrance_z9b1':
 					OWNOpenDoor(1);
 					break;

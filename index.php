@@ -35,6 +35,12 @@ if(!empty($_POST['action'])){
 					_add_to_action_queue('unlock_elevator_z9b2', $_SESSION['id'], time() + 75);
 				}
 
+				if(_check_permission('z9b1elevator') && $user['apartment'] == 'Z9.B1.501'){
+					_add_to_action_queue('unlock_elevator_z9b1', $_SESSION['id'], time() + 45);
+					_add_to_action_queue('unlock_elevator_z9b1', $_SESSION['id'], time() + 60);
+					_add_to_action_queue('unlock_elevator_z9b1', $_SESSION['id'], time() + 75);
+				}
+
 				$message = 'Gate and garage opened';
 				$status = 'ok';
 			}

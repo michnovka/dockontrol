@@ -32,8 +32,10 @@
 
                 if(data.status === 'ok'){
                     //$(actionResultSelector).removeClass('uk-alert-danger').addClass('uk-alert-success').show(200);
+                    var canVibrate = "vibrate" in navigator;
 
-                    window.navigator.vibrate(100);
+                    if(canVibrate)
+                        window.navigator.vibrate(100);
 
                 }else{
                     $(actionResultSelector).removeClass('uk-alert-success').addClass('uk-alert-danger').show(200);

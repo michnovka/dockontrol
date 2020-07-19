@@ -206,6 +206,13 @@
             padding: 0;
         }
 
+
+        button.uk-button,h1,h2,h3,h4,h5{
+            user-select: none; /* supported by Chrome and Opera */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+        }
     </style>
 
 

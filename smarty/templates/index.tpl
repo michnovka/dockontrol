@@ -5,64 +5,55 @@
     var lastTimeout = null;
     var stopTimer = false;
 
-    function doAction(what, element, isInModal, repeatTimes, reSetUpHooks){
+    function doAction(what, element, isInModal, reSetUpHooks){
         var actionResultSelector = $('div#action_result');
 
         if(isInModal)
             actionResultSelector = $(element).closest('.uk-modal').find('.notify_modal');
 
-        if(what !== 'stopTimer'){
+        $(element).data('original', $(element).html());
+        $(element).data('originalDisabled' ,$(element).prop('disabled'));
+        $(element).data('originalId' ,$(element).attr('id'));
+        $(element).html('<div uk-spinner></div>').addClass('spinner').prop('disabled', true);
 
-            if(!repeatTimes){
-                $(element).data('original', $(element).html());
-                $(element).data('originalDisabled' ,$(element).prop('disabled'));
-                $(element).data('originalId' ,$(element).attr('id'));
-                $(element).html('<div uk-spinner></div>').addClass('spinner').prop('disabled', true);
+        what = what.replace(/_options/g,'');
+
+        $.post(window.location.self, { action : what }, function(data){
+            $(actionResultSelector).find('p').text(data.message);
+
+            var doNotHideActionResult = false;
+
+            if(data.status === 'ok'){
+                //$(actionResultSelector).removeClass('uk-alert-danger').addClass('uk-alert-success').show(200);
+                var canVibrate = "vibrate" in navigator;
+
+                if(canVibrate)
+                    window.navigator.vibrate(100);
+
             }else{
-                $(element).html('Close garage').prop('disabled', false).attr('id', 'stopTimer');
+                $(actionResultSelector).removeClass('uk-alert-success').addClass('uk-alert-danger').show(200);
             }
 
+            if(!doNotHideActionResult){
 
-            what = what.replace(/_options/g,'');
+                setTimeout(function(){ $(actionResultSelector).hide(200);}, 3000);
 
-            $.post(window.location.self, { action : what, repeat_times: repeatTimes }, function(data){
-                $(actionResultSelector).find('p').text(data.message);
+                setTimeout(function(){
+                    $(element).removeClass('spinner').html($(element).data('original')).prop('disabled', $(element).data('originalDisabled')).attr('id', $(element).data('originalId')).removeClass('success');
+                    if(reSetUpHooks) {
+                        setUpHooks($(element).find('div.single_open'));
+                        setUpHooksCamera($(element).find('div.camera'));
+                    }
+                }, 2000);
 
-                var doNotHideActionResult = false;
+                $(element).html('<svg id="successAnimation" class="animated" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 70 70">' +
+                    '  <path id="successAnimationResult" fill="#D8D8D8" d="M35,60 C21.1928813,60 10,48.8071187 10,35 C10,21.1928813 21.1928813,10 35,10 C48.8071187,10 60,21.1928813 60,35 C60,48.8071187 48.8071187,60 35,60 Z M23.6332378,33.2260427 L22.3667622,34.7739573 L34.1433655,44.40936 L47.776114,27.6305926 L46.223886,26.3694074 L33.8566345,41.59064 L23.6332378,33.2260427 Z"/>' +
+                    '  <circle id="successAnimationCircle" cx="35" cy="35" r="24" stroke="#979797" stroke-width="2" stroke-linecap="round" fill="transparent"/>' +
+                    '  <polyline id="successAnimationCheck" stroke="#979797" stroke-width="2" points="23 34 34 43 47 27" fill="transparent"/>' +
+                    '</svg>').removeClass('active').addClass('success');
+            }
+        }, 'json');
 
-                if(data.status === 'ok'){
-                    //$(actionResultSelector).removeClass('uk-alert-danger').addClass('uk-alert-success').show(200);
-                    var canVibrate = "vibrate" in navigator;
-
-                    if(canVibrate)
-                        window.navigator.vibrate(100);
-
-                }else{
-                    $(actionResultSelector).removeClass('uk-alert-success').addClass('uk-alert-danger').show(200);
-                }
-
-                if(!doNotHideActionResult){
-
-                    setTimeout(function(){ $(actionResultSelector).hide(200);}, 3000);
-
-                    setTimeout(function(){
-                        $(element).removeClass('spinner').html($(element).data('original')).prop('disabled', $(element).data('originalDisabled')).attr('id', $(element).data('originalId')).removeClass('success');
-                        if(reSetUpHooks) {
-                            setUpHooks($(element).find('div.single_open'));
-                            setUpHooksCamera($(element).find('div.camera'));
-                        }
-                    }, 2000);
-
-                    $(element).html('<svg id="successAnimation" class="animated" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 70 70">' +
-                        '  <path id="successAnimationResult" fill="#D8D8D8" d="M35,60 C21.1928813,60 10,48.8071187 10,35 C10,21.1928813 21.1928813,10 35,10 C48.8071187,10 60,21.1928813 60,35 C60,48.8071187 48.8071187,60 35,60 Z M23.6332378,33.2260427 L22.3667622,34.7739573 L34.1433655,44.40936 L47.776114,27.6305926 L46.223886,26.3694074 L33.8566345,41.59064 L23.6332378,33.2260427 Z"/>' +
-                        '  <circle id="successAnimationCircle" cx="35" cy="35" r="24" stroke="#979797" stroke-width="2" stroke-linecap="round" fill="transparent"/>' +
-                        '  <polyline id="successAnimationCheck" stroke="#979797" stroke-width="2" points="23 34 34 43 47 27" fill="transparent"/>' +
-                        '</svg>').removeClass('active').addClass('success');
-                }
-            }, 'json');
-        }else{
-            $(element).html('<div uk-spinner></div>').prop('disabled', true);
-        }
     }
 
     var open_garage_gate_modal;
@@ -182,7 +173,7 @@
                 if(touchMoved !== true || isInModal) {
                     clicksWithoutAction = 0;
                     console.log('held: ' + this_id);
-                    doAction(this_id, this_object, isInModal, 0, reSetUpHooks);
+                    doAction(this_id, this_object, isInModal, reSetUpHooks);
                 }
             }, 250);
 

@@ -7,10 +7,6 @@ require_once(dirname(__FILE__).'/libs/api_libs.php');
 require_once(dirname(__FILE__).'/libs/process_action.php');
 require_once(dirname(__FILE__).'/config/API_SECRET.php');
 
-function APIError($message, $code){
-        echo json_encode(array('status' => 'error', 'code' => $code, 'message' => $message));
-}
-
 $authentication_error = "Authentication error";
 $api_action = 'local_relay';
 $user = null;
@@ -25,34 +21,12 @@ if(!empty($_GET['secret'])){
 
 	$api_action = $_GET['action'];
 
-	// check IP bruteforce
-	$is_bruteforce = $db->fetch('SELECT IF(COUNT(*) > 10, 1, 0) FROM api_calls_failed WHERE ip=? AND time > DATE_SUB(NOW(), INTERVAL 5 MINUTE )', $_SERVER['REMOTE_ADDR']);
-
-	if($is_bruteforce){
-		$authentication_error = 'Too many tries. Repeat in 5 mins';
-	}else {
-		// check username and pwd
-		$user = $db->queryfirst('SELECT * FROM users WHERE username=? AND enabled=1 LIMIT 1', $_GET['username']);
-
-		if(empty($user) || !PasswordTools::checkPassword($_GET['password'], $user['password'])){
-			$authentication_error = 'Invalid username or password';
-		}else{
-			$db->query('INSERT INTO api_calls SET user_id=#, time=NOW(), ip=?, api_action = ?', $user['id'], $_SERVER['REMOTE_ADDR'], $api_action);
-			$authentication_error = false;
-		}
-	}
+	$authentication_error = checkAPILoginAuthenticationError($_GET['username'], $_GET['password'], $_SERVER['REMOTE_ADDR'], $api_action, $user);
 
 }
 
 if($authentication_error){
-	try {
-		$db->query('INSERT INTO api_calls_failed SET username=?, time=NOW(), ip=?, api_action=?', '', $_SERVER['REMOTE_ADDR'], $api_action);
-	}catch(EDatabase $e){
-		// do nothing
-	}
-
-	APIError($authentication_error, 403);
-	exit;
+	_log_authentication_error($api_action, $authentication_error);
 }
 
 $reply = array();

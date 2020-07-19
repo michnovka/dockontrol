@@ -2,10 +2,30 @@
 
 
 require_once dirname(__FILE__).'/libs/config.php';
+require_once dirname(__FILE__).'/libs/api_libs.php';
 
-_require_login();
 
-$user = _get_user_array();
+$user = null;
+
+if(!empty($_GET['username'])){
+
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
+
+	$api_action = 'camera';
+
+	$authentication_error = checkAPILoginAuthenticationError($_GET['username'], $_GET['password'], $_SERVER['REMOTE_ADDR'], $api_action, $user);
+
+	if($authentication_error){
+		_log_authentication_error($api_action, $authentication_error);
+	}
+
+}else{
+	_require_login();
+
+	$user = _get_user_array();
+}
+
 
 $cameras = array(
 	'gate' => 'entrance_menclova',
@@ -41,7 +61,7 @@ if(!array_key_exists($camera, $cameras)){
 	exit;
 }
 
-if(!_check_permission($cameras[$camera])){
+if(!_check_permission($cameras[$camera], $user)){
 	echo 'Not authorized';
 	exit;
 }
@@ -54,8 +74,8 @@ if(empty($camera)){
 }
 
 // disabled for now
-if(false && $_SESSION['id'] != 1) {
-	$fetches_in_5min = $db->fetch('SELECT COUNT(*) FROM camera_log WHERE user_id=# AND camera_name_id=? AND time > DATE_SUB(NOW(), INTERVAL 5 MINUTE )', $_SESSION['id'], $camera['name_id']);
+if(false && $user['id'] != 1) {
+	$fetches_in_5min = $db->fetch('SELECT COUNT(*) FROM camera_log WHERE user_id=# AND camera_name_id=? AND time > DATE_SUB(NOW(), INTERVAL 5 MINUTE )', $user['id'], $camera['name_id']);
 
 	if ($fetches_in_5min > 150) {
 		header('Content-type: image/png');
@@ -81,7 +101,7 @@ if((time() - strtotime($camera['last_fetched'])) >= 1){
 
 	$db->query('UPDATE cameras SET data_jpg=??, last_fetched = NOW() WHERE name_id=?', $photo_data, $camera['name_id']);
 
-	$db->query('INSERT INTO camera_log SET user_id=#, camera_name_id=?, time=NOW()', $_SESSION['id'], $camera['name_id']);
+	$db->query('INSERT INTO camera_log SET user_id=#, camera_name_id=?, time=NOW()', $user['id'], $camera['name_id']);
 }else {
 	// show old photo
 	$photo_data = $db->fetch('SELECT data_jpg FROM cameras WHERE name_id=? LIMIT 1', $camera['name_id']);

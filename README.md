@@ -27,6 +27,13 @@ The API call looks like
 https://HOSTNAME/api.php?username=XXXXXX&password=YYYYYYY&action=ZZZZZZ
 ```
 
-Where action can be any of the supported functions from [process_action.php](./libs/process_action.php)
+Where `action` can be any of the supported functions from [process_action.php](./libs/process_action.php)
+
+The API call to fetch camera JPG looks like
+```http request
+https://HOSTNAME/camera.php?username=XXXXXX&password=YYYYYYY&camera=ZZZZZZ
+```
+
+Where `camera` is a key value of the `$cameras` array in [camera.php](./camera.php)
 
 Permissions are checked and API calls are logged (as well as unsuccessful ones). There is a simple IP-time based brute-force protection.

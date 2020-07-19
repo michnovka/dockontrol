@@ -93,7 +93,7 @@
                 picture_element.parent().find('.paused_container').show();
             }else
                 picture_element.attr('src', picture_element.attr('src')+'1');
-        }, 2000);
+        }, 3000);
     }
 
     function startPictureInterval2(){
@@ -110,7 +110,7 @@
                 }
             }else
                 picture2_element.attr('src', picture2_element.attr('src')+'1');
-        }, 2000);
+        }, 3000);
     }
 
     function setUpHooksCamera(element){

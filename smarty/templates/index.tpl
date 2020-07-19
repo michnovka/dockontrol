@@ -134,13 +134,14 @@
 
             startPictureInterval();
 
+            picture2_element.parent().find('.paused_container').hide();
+
             if(button_element.hasClass('entrance')){
                 picture2_element.hide();
                 button_open_1min_element.hide();
             }else{
                 picture2_element.show().attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera_id+'_in&now'+Date.now());
                 button_open_1min_element.show().attr('id', new_button_id+'_1min');
-                picture2_element.parent().find('.paused_container').hide();
                 startPictureInterval2();
             }
 

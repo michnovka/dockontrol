@@ -220,14 +220,29 @@
         $('div.picture_container').click(function () {
             var imageElement = $(this).find('img.open_garage_gate_modal_camera_picture');
 
-            imageElement.attr('src', imageElement.attr('src')+'1');
+            var pausedContainerElement = $(this).find('.paused_container');
 
-            $(this).find('.paused_container').hide();
+            if(pausedContainerElement.is(':hidden')){
 
-            if(imageElement.attr('id') === 'open_garage_gate_modal_camera_picture'){
-                startPictureInterval();
-            }else{
-                startPictureInterval2();
+                pausedContainerElement.show();
+
+                if (imageElement.attr('id') === 'open_garage_gate_modal_camera_picture') {
+                    clearInterval(pictureInterval);
+                }else{
+                    clearInterval(pictureInterval2);
+                }
+
+            } else {
+
+                imageElement.attr('src', imageElement.attr('src')+'1');
+
+                pausedContainerElement.hide();
+
+                if (imageElement.attr('id') === 'open_garage_gate_modal_camera_picture') {
+                    startPictureInterval();
+                } else {
+                    startPictureInterval2();
+                }
             }
         });
 

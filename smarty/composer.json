@@ -28,7 +28,8 @@
     },
     "require": {
         "php": ">=7.*",
-      "ext-curl": "*"
+      "ext-curl": "*",
+      "ext-json": "*"
     },
     "autoload": {
         "classmap": [

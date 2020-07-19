@@ -19,23 +19,43 @@ $smarty->setConfigDir(dirname(__FILE__).'/../smarty/configs');
 
 $db = new Database4('localhost', 'dock', 'ObamaIsNotOsama!', 'dock', 'mysqli');
 
+/**
+ * @param string $action
+ * @param int $user_id
+ * @param int $time_start_unixtime
+ * @throws EDatabase
+ */
 function _add_to_action_queue($action, $user_id, $time_start_unixtime){
 	global $db;
 
 	$db->query('INSERT INTO action_queue SET time_created=NOW(), time_start=?, user_id=#, action=?', date('Y-m-d H:i:s', $time_start_unixtime), $user_id, $action);
 }
 
-function _check_permission($permission)
+/**
+ * @param string $permission
+ * @param null|array $user
+ * @return bool
+ * @throws EDatabase
+ */
+function _check_permission($permission, $user = null)
 {
 	global $db;
 
-	if (empty($_SESSION['permissions'])) {
+	if(!empty($user)){
+		_get_permissions($user['id'], false);
+	}elseif(empty($_SESSION['permissions'])) {
 		_get_permissions();
 	}
 
 	return $_SESSION['permissions'][$permission] == 1;
 }
 
+/**
+ * @param null|int $user_id
+ * @param bool $ignore_admin
+ * @return array
+ * @throws EDatabase
+ */
 function _get_permissions($user_id = null, $ignore_admin = true)
 {
 	global $db;
@@ -78,6 +98,11 @@ function _log_login_success($user, $is_from_remember_me = false){
 	$db->query('UPDATE users SET last_login_time=NOW() WHERE id=#', $user['id']);
 }
 
+/**
+ * @param bool $log
+ * @return bool
+ * @throws EDatabase
+ */
 function _restore_remember_me_cookie($log=true){
 	global $db;
 
@@ -109,6 +134,10 @@ function _restore_remember_me_cookie($log=true){
 
 }
 
+/**
+ * @param int $user_id
+ * @param int $duration
+ */
 function _create_remember_me_cookie($user_id, $duration = 8640000){
 	$expires = time() + $duration;
 	$cookie_value = $user_id.':'.$expires.':'.hash('sha256', $user_id.$expires.'SecretHashWhardjbdiubd*fif');
@@ -116,6 +145,11 @@ function _create_remember_me_cookie($user_id, $duration = 8640000){
 	setcookie('rememberme', $cookie_value, $expires);
 }
 
+/**
+ * @param null|int $user_id
+ * @return array|mixed
+ * @throws EDatabase
+ */
 function _get_user_array($user_id = null){
 	global $db;
 
@@ -125,6 +159,11 @@ function _get_user_array($user_id = null){
 	return $db->queryfirst('SELECT * FROM users WHERE id=# LIMIT 1', $user_id);
 }
 
+/**
+ * @param string $redirect_to
+ * @return bool
+ * @throws EDatabase
+ */
 function _require_login($redirect_to = '/login.php'){
 
 	if(empty($_SESSION['id']))

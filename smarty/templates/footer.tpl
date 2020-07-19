@@ -6,7 +6,7 @@
 
     <div class="uk-width-1-1@l">
         {$user.name} -
-        {if $permissions.admin}{if $admin_limited_view}<a href="/?admin">Full view</a>{else}<a href="/">CP</a>{/if} |{/if}
+        {if $permissions.admin && $admin_limited_view}<a href="/?admin">Full view</a>{else}<a href="/">CP</a>{/if} |
         <a href="settings.php">Settings</a> |
         {if $permissions.admin}<a href="queue.php">Queue</a> |{/if}
         {if $permissions.admin}<a href="admin_users.php">Users</a> |{/if}

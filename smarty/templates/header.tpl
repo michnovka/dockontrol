@@ -213,6 +213,23 @@
             -moz-user-select: none; /* Firefox */
             -ms-user-select: none; /* Internet Explorer/Edge */
         }
+
+        div.picture_container{
+            position: relative;
+            cursor: pointer;
+        }
+
+        div.paused_container{
+            position: absolute;
+            top:calc(50% - 40px);
+            right:calc(50% - 40px);
+        }
+
+        img.open_garage_gate_modal_camera_picture{
+            width: 100%;
+            height: 100%;
+
+        }
     </style>
 
 

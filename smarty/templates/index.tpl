@@ -74,6 +74,45 @@
 
     var clicksWithoutAction = 0;
 
+    var pictureInterval = null;
+    var pictureInterval2 = null;
+
+    var picture_element,picture2_element;
+
+    function startPictureInterval(){
+        clearInterval(pictureInterval);
+
+        pictureInterval = window.setInterval(function () {
+
+            console.log('interval');
+
+            if(isCurrentWindowHidden || !picture_element.is(':visible')) {
+                console.log('clearinterval');
+
+                clearInterval(pictureInterval);
+                picture_element.parent().find('.paused_container').show();
+            }else
+                picture_element.attr('src', picture_element.attr('src')+'1');
+        }, 2000);
+    }
+
+    function startPictureInterval2(){
+        clearInterval(pictureInterval2);
+
+        pictureInterval2 = window.setInterval(function () {
+            console.log('interval2');
+
+            if(isCurrentWindowHidden || picture2_element.is(':hidden') || !picture2_element.is(':visible')) {
+                console.log('clearinterval2');
+                clearInterval(pictureInterval2);
+                if(!picture2_element.is(':hidden') && picture2_element.is(':visible')) {
+                    picture2_element.parent().find('.paused_container').show();
+                }
+            }else
+                picture2_element.attr('src', picture2_element.attr('src')+'1');
+        }, 2000);
+    }
+
     function setUpHooksCamera(element){
 
         $(element).click(function() {
@@ -84,9 +123,6 @@
             var new_button_id = button_id.replace(/_options/g,'');
             var camera_id = new_button_id.replace(/open_/g,'');
 
-            var picture_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture');
-            var picture2_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture2');
-
             $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button').attr('id', new_button_id);
 
             var button_open_1min_element = $(open_garage_gate_modal).find('button.open_garage_gate_1min_dummy_button');
@@ -94,6 +130,9 @@
             $(open_garage_gate_modal).find('h2#open_garage_gate_modal_title').text('Open ' + $(this).parent().find('div.single_open').text());
 
             picture_element.attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera_id+'&now'+Date.now());
+            picture_element.parent().find('.paused_container').hide();
+
+            startPictureInterval();
 
             if(button_element.hasClass('entrance')){
                 picture2_element.hide();
@@ -101,8 +140,9 @@
             }else{
                 picture2_element.show().attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera_id+'_in&now'+Date.now());
                 button_open_1min_element.show().attr('id', new_button_id+'_1min');
+                picture2_element.parent().find('.paused_container').hide();
+                startPictureInterval2();
             }
-
 
             var modal = UIkit.modal(open_garage_gate_modal);
             modal.show();
@@ -178,15 +218,25 @@
 
     $(document).ready(function(){
 
+        open_garage_gate_modal = $('div#open_garage_gate_modal');
+        picture_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture');
+        picture2_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture2');
 
         setUpHooks('button.clickable,button.garage_gate_modal div.single_open');
-
-        open_garage_gate_modal = $('div#open_garage_gate_modal');
-
         setUpHooksCamera('button.garage_gate_modal div.camera');
 
-        $('img#open_garage_gate_modal_camera_picture,img#open_garage_gate_modal_camera_picture2').click(function () {
-            $(this).attr('src', $(this).attr('src')+'1');
+        $('div.picture_container').click(function () {
+            var imageElement = $(this).find('img.open_garage_gate_modal_camera_picture');
+
+            imageElement.attr('src', imageElement.attr('src')+'1');
+
+            $(this).find('.paused_container').hide();
+
+            if(imageElement.attr('id') === 'open_garage_gate_modal_camera_picture'){
+                startPictureInterval();
+            }else{
+                startPictureInterval2();
+            }
         });
 
     });
@@ -208,6 +258,29 @@
         history.pushState(null, null, window.location.pathname);
 
     }, false);
+
+    var hidden, visibilityChange;
+    if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+        hidden = "hidden";
+        visibilityChange = "visibilitychange";
+    } else if (typeof document.msHidden !== "undefined") {
+        hidden = "msHidden";
+        visibilityChange = "msvisibilitychange";
+    } else if (typeof document.webkitHidden !== "undefined") {
+        hidden = "webkitHidden";
+        visibilityChange = "webkitvisibilitychange";
+    }
+
+    var isCurrentWindowHidden = false;
+
+    // If the page is hidden, pause the video;
+    // if the page is shown, play the video
+    function handleVisibilityChange() {
+        isCurrentWindowHidden = !!document[hidden];
+    }
+
+    // Handle page visibility change
+    document.addEventListener(visibilityChange, handleVisibilityChange, false);
 
 </script>
 
@@ -297,8 +370,14 @@
                 <p></p>
             </div>
             <div class="uk-grid-small uk-text-center uk-grid-row-small" uk-grid>
-                <div class="uk-width-1-1"><img src="loading.jpg" style="width: 100%; height: 100%; cursor: pointer;" id="open_garage_gate_modal_camera_picture" /></div>
-                <div class="uk-width-1-1"><img src="loading.jpg" style="width: 100%; height: 100%; cursor: pointer;" id="open_garage_gate_modal_camera_picture2" /></div>
+                <div class="uk-width-1-1 picture_container">
+                    <img src="loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture" />
+                    <div class="paused_container"><img src="pause.svg" width="80" /></div>
+                </div>
+                <div class="uk-width-1-1 picture_container">
+                    <img src="loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture2" />
+                    <div class="paused_container"><img src="pause.svg" width="80" /></div>
+                </div>
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_dummy_button" type="button" class="open_garage_gate_dummy_button uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">SINGLE OPEN</button></div>
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_1min_dummy_button" type="button" class="open_garage_gate_1min_dummy_button uk-button uk-button-large uk-button-danger uk-width-1-1 clickable clickable_modal" value="">OPEN FOR 1 MIN</button></div>
             </div>

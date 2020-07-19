@@ -9,9 +9,6 @@ $user = null;
 
 if(!empty($_GET['username'])){
 
-	error_reporting(E_ALL);
-	ini_set('display_errors', 1);
-
 	$api_action = 'camera';
 
 	$authentication_error = checkAPILoginAuthenticationError($_GET['username'], $_GET['password'], $_SERVER['REMOTE_ADDR'], $api_action, $user);

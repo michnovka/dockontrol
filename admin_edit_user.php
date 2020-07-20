@@ -73,11 +73,11 @@ if(!empty($_POST['action'])){
 			// save all except pwd
 			if(!$_POST['id']){
 				// create new user
-				$db->query('INSERT INTO users SET username=?, password=?,name=?,created=NOW(),enabled=#,apartment=?,default_garage=?,email=?,phone=?', $_POST['username'],PasswordTools::getHashedPassword($_POST['password']), $_POST['name'], $_POST['enabled'] ? 1 : 0, $_POST['apartment'],$_POST['default_garage'], $_POST['email'], $_POST['phone']);
+				$db->query('INSERT INTO users SET username=?, password=?,name=?,created=NOW(),enabled=#,has_camera_access=#,apartment=?,default_garage=?,email=?,phone=?', $_POST['username'],PasswordTools::getHashedPassword($_POST['password']), $_POST['name'], $_POST['enabled'] ? 1 : 0, $_POST['has_camera_access'] ? 1 : 0, $_POST['apartment'],$_POST['default_garage'], $_POST['email'], $_POST['phone']);
 				$_GET['id'] = $_POST['id'] = $db->lastinsertid();
 			}else{
 				// update user
-				$db->query('UPDATE users SET username=?, name=?,enabled=#,apartment=?,default_garage=?,email=?,phone=? WHERE id=#', $_POST['username'], $_POST['name'], $_POST['enabled'] ? 1 : 0, $_POST['apartment'],$_POST['default_garage'], $_POST['email'], $_POST['phone'], $_POST['id']);
+				$db->query('UPDATE users SET username=?, name=?,enabled=#,has_camera_access=#,apartment=?,default_garage=?,email=?,phone=? WHERE id=#', $_POST['username'], $_POST['name'], $_POST['enabled'] ? 1 : 0,  $_POST['has_camera_access'] ? 1 : 0, $_POST['apartment'],$_POST['default_garage'], $_POST['email'], $_POST['phone'], $_POST['id']);
 
 				if($_POST['password']) {
 					// save pwd

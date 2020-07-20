@@ -82,6 +82,13 @@
             </div>
         </div>
 
+        <div class="uk-margin">
+            <label class="uk-form-label" for="has_camera_access">Camera access</label>
+            <div class="uk-form-controls">
+                <input class="uk-checkbox" id="has_camera_access" name="has_camera_access" type="checkbox" value="1"{if $edit_user.has_camera_access} checked{/if}>
+            </div>
+        </div>
+
 
         <div class="uk-margin">
             <div class="uk-form-label">Groups</div>

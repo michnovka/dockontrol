@@ -67,22 +67,22 @@ while($minute_start == date('i')) {
 			switch ($action) {
 				case 'open_gate':
 //					DoAction(3, 'DOUBLECLICK', 300000, 100000);
-					DoAction(3, 'PULSE', 500000);
+					DoAction(3, 'PULSE', 100000);
 					break;
 				case 'open_garage_z9':
-					DoAction(2, 'PULSE', 500000);
+					DoAction(2, 'PULSE', 100000);
 					break;
 				case 'open_garage_z8':
-					DoActionRemote('192.168.1.197', 1, 'PULSE', 500000);
+					DoActionRemote('192.168.1.197', 1, 'PULSE', 100000);
 					break;
 				case 'open_garage_z7':
-					DoActionRemote('192.168.1.195', 1, 'PULSE', 500000);
+					DoActionRemote('192.168.1.195', 1, 'PULSE', 100000);
 					break;
 				case 'unlock_elevator_z9b2':
-					DoAction(1, 'PULSE', 500000);
+					DoAction(1, 'PULSE', 100000);
 					break;
 				case 'unlock_elevator_z9b1':
-					DoAction(5, 'PULSE', 500000);
+					DoAction(5, 'PULSE', 100000);
 					break;
 				case 'open_entrance_z9b1':
 					OWNOpenDoor(1);

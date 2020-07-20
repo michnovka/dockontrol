@@ -83,7 +83,7 @@ if(false && $user['id'] != 1) {
 
 $photo_data = null;
 
-if((time() - strtotime($camera['last_fetched'])) >= 1){
+if((time() - strtotime($camera['last_fetched'])) > 1){
 	// fetch new photo
 
 	$ch = curl_init();

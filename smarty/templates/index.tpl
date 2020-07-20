@@ -377,6 +377,7 @@
                 <p></p>
             </div>
             <div class="uk-grid-small uk-text-center uk-grid-row-small" uk-grid>
+                {if $user.has_camera_access}
                 <div class="uk-width-1-1 picture_container">
                     <img src="loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture" />
                     <div class="paused_container"><img src="pause.svg" width="80" /></div>
@@ -385,6 +386,7 @@
                     <img src="loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture2" />
                     <div class="paused_container"><img src="pause.svg" width="80" /></div>
                 </div>
+                {/if}
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_dummy_button" type="button" class="open_garage_gate_dummy_button uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">SINGLE OPEN</button></div>
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_1min_dummy_button" type="button" class="open_garage_gate_1min_dummy_button uk-button uk-button-large uk-button-danger uk-width-1-1 clickable clickable_modal" value="">OPEN FOR 1 MIN</button></div>
             </div>

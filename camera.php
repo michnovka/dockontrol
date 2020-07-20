@@ -13,6 +13,11 @@ if(!empty($_GET['username'])){
 
 	$authentication_error = checkAPILoginAuthenticationError($_GET['username'], $_GET['password'], $_SERVER['REMOTE_ADDR'], $api_action, $user);
 
+
+	if(!$authentication_error && !$user['has_camera_access']){
+		$authentication_error = 'User does not have camera access';
+	}
+
 	if($authentication_error){
 		_log_authentication_error($api_action, $authentication_error);
 	}
@@ -21,6 +26,7 @@ if(!empty($_GET['username'])){
 	_require_login();
 
 	$user = _get_user_array();
+
 }
 
 
@@ -52,6 +58,11 @@ $camera = $_GET['camera'];
 
 if(!empty($cameras_map[$camera]))
 	$camera = $cameras_map[$camera];
+
+if(!$user['has_camera_access']){
+	echo 'Not authorized';
+	exit;
+}
 
 if(!array_key_exists($camera, $cameras)){
 	echo "No such camera";

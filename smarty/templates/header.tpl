@@ -194,6 +194,7 @@
         }
 
         button.garage_gate_modal div.camera{
+            {if !$user.has_camera_access}display:none;{/if}
             width: 25%; float: left;
             background-color: aliceblue;
         }
@@ -230,6 +231,7 @@
             height: 100%;
 
         }
+
     </style>
 
 

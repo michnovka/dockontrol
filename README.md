@@ -2,6 +2,14 @@
 
 Control panel to open gates, entrances and garage doors at DOCK residence in Prague
 
+## Features
+- Opening gates and garages
+- Opening building entrances
+- Camera snapshots
+- API control and camera streams
+- Guest passes
+- User control with permission management
+
 ## Requirements
 
 PHP 7.3+, michnovka/openwebnet-php submodule to communicate with Bticino

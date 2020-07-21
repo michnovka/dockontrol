@@ -7,9 +7,15 @@ require_once dirname(__FILE__).'/libs/config.php';
 
 _require_login();
 
+
 if(!empty($_POST['action'])) {
 
 	$user = _get_user_array();
+
+	if(!$user['can_create_guests']){
+		echo 'Not authorized';
+		exit;
+	}
 
 	switch ($_POST['action']) {
 
@@ -35,6 +41,12 @@ if(!empty($_POST['action'])) {
 }
 
 $user = _get_user_array();
+
+
+if(!$user['can_create_guests']){
+	echo 'Not authorized';
+	exit;
+}
 
 $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions());

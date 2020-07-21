@@ -21,6 +21,9 @@
 
     {/if}
 
+    <p>Guests can open the same entrances / gates like you, they have no camera access and their access can be limited by both time and number of actions (unlocks / opens) they can perform.</p>
+
+    <hr />
     <form class="uk-form-stacked uk-margin-large uk-text-left" method="post">
 
         <div class="uk-margin">

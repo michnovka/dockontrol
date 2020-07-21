@@ -23,7 +23,9 @@
 
             var doNotHideActionResult = false;
 
-            if(data.status === 'ok'){
+            if(data.status === 'relogin'){
+                window.location.reload();
+            }else if(data.status === 'ok'){
                 //$(actionResultSelector).removeClass('uk-alert-danger').addClass('uk-alert-success').show(200);
                 var canVibrate = "vibrate" in navigator;
 

@@ -13,6 +13,9 @@ if(!empty($_SESSION['id'])){
 if(!empty($_GET['username']))
 	$smarty->assign('username', $_GET['username']);
 
+if(!empty($_GET['guest_error']))
+	$smarty->assign('error', "Expired or incorrect guest token.");
+
 if(!empty($_POST['action']) && $_POST['action'] == 'log_in'){
 	//log in
 

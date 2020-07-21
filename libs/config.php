@@ -23,12 +23,13 @@ $db = new Database4('localhost', 'dock', 'ObamaIsNotOsama!', 'dock', 'mysqli');
  * @param string $action
  * @param int $user_id
  * @param int $time_start_unixtime
+ * @param int $guest_id
  * @throws EDatabase
  */
-function _add_to_action_queue($action, $user_id, $time_start_unixtime){
+function _add_to_action_queue($action, $user_id, $time_start_unixtime, $guest_id = null){
 	global $db;
 
-	$db->query('INSERT INTO action_queue SET time_created=NOW(), time_start=?, user_id=#, action=?', date('Y-m-d H:i:s', $time_start_unixtime), $user_id, $action);
+	$db->query('INSERT INTO action_queue SET time_created=NOW(), time_start=?, user_id=#, action=?'.($guest_id ? ',guest_id='.intval($guest_id) : ''), date('Y-m-d H:i:s', $time_start_unixtime), $user_id, $action);
 }
 
 /**
@@ -179,6 +180,35 @@ function _require_login($redirect_to = '/login.php'){
 	}
 
 	return true;
+}
+
+/**
+ * @param string $guest_hash
+ * @param string $redirect_to
+ * @return array|false
+ * @throws EDatabase
+ */
+function _require_guest_login($guest_hash, $redirect_to = '/login.php?guest_error=1'){
+
+	global $db;
+
+	if(!empty($_SESSION['id'])){
+		header('Location: /');
+		exit;
+	}
+
+	$guest = $db->queryfirst('SELECT * FROM guests WHERE hash=? AND expires > NOW() AND remaining_actions != 0 LIMIT 1', $guest_hash);
+
+	if(empty($guest)){
+		if($redirect_to) {
+			header('Location: ' . $redirect_to);
+			exit;
+		}else{
+			return false;
+		}
+	}
+
+	return $guest;
 }
 
 $_CONFIG = null;

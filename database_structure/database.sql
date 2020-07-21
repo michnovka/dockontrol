@@ -29,14 +29,17 @@ CREATE TABLE `action_queue` (
                                 `executed` tinyint(4) NOT NULL DEFAULT 0,
                                 `action` varchar(255) NOT NULL,
                                 `user_id` int(11) NOT NULL,
+                                `guest_id` int(11) DEFAULT NULL,
                                 PRIMARY KEY (`id`),
                                 KEY `queue_users_id_fk` (`user_id`),
                                 KEY `queue_executed_index` (`executed`),
                                 KEY `queue_time_created_index` (`time_created`),
                                 KEY `queue_time_start_index` (`time_start`),
                                 KEY `action_queue_action_index` (`action`),
+                                KEY `action_queue_guests_id_fk` (`guest_id`),
+                                CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3035 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3056 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -98,7 +101,7 @@ CREATE TABLE `camera_log` (
                               KEY `camera_log_time_index` (`time`),
                               CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                               CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5122 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5124 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -160,6 +163,26 @@ CREATE TABLE `groups` (
                           `admin` tinyint(4) NOT NULL DEFAULT 0,
                           PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `guests`
+--
+
+DROP TABLE IF EXISTS `guests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `guests` (
+                          `id` int(11) NOT NULL AUTO_INCREMENT,
+                          `user_id` int(11) NOT NULL,
+                          `hash` varchar(32) NOT NULL,
+                          `expires` datetime NOT NULL,
+                          `remaining_actions` int(11) NOT NULL DEFAULT -1 COMMENT '-1 unlimited\n0 no actions left\nN actions left',
+                          PRIMARY KEY (`id`),
+                          UNIQUE KEY `guests_hash_uindex` (`hash`),
+                          KEY `guests_users_id_fk` (`user_id`),
+                          CONSTRAINT `guests_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -242,6 +265,7 @@ CREATE TABLE `users` (
                          `button_press_type` enum('click','hold') NOT NULL DEFAULT 'hold',
                          `apartment` varchar(63) NOT NULL,
                          `has_camera_access` tinyint(4) NOT NULL DEFAULT 1,
+                         `can_create_guests` tinyint(4) NOT NULL DEFAULT 1,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `users_username_uindex` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4;
@@ -256,4 +280,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-21  1:37:12
+-- Dump completed on 2020-07-21  2:37:57

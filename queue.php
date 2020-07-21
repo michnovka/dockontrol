@@ -24,8 +24,8 @@ if(
 	$limit = intval($_GET['limit']);
 }
 
-$db->queryall('SELECT q.*, u.name, u.username FROM action_queue q INNER JOIN users u ON u.id = q.user_id WHERE q.executed=1 ORDER BY q.time_start DESC LIMIT #', $queue_executed, '', $limit);
-$db->queryall('SELECT q.*, u.name, u.username FROM action_queue q INNER JOIN users u ON u.id = q.user_id WHERE q.executed=0 ORDER BY q.time_start ASC LIMIT #', $queue, '', $limit);
+$db->queryall('SELECT q.*, CONCAT(u.name, IF(g.id IS NOT NULL, CONCAT(\' (Guest \',g.id,\')\'), \'\')) as name, u.username FROM action_queue q INNER JOIN users u ON u.id = q.user_id LEFT JOIN guests g on q.guest_id = g.id WHERE q.executed=1 ORDER BY q.time_start DESC LIMIT #', $queue_executed, '', $limit);
+$db->queryall('SELECT q.*, CONCAT(u.name, IF(g.id IS NOT NULL, CONCAT(\' (Guest \',g.id,\')\'), \'\')) as name, u.username FROM action_queue q INNER JOIN users u ON u.id = q.user_id LEFT JOIN guests g on q.guest_id = g.id WHERE q.executed=0 ORDER BY q.time_start ASC LIMIT #', $queue, '', $limit);
 
 $smarty->assign('queue', $queue);
 $smarty->assign('queue_executed', $queue_executed);

@@ -89,6 +89,13 @@
             </div>
         </div>
 
+        <div class="uk-margin">
+            <label class="uk-form-label" for="can_create_guests">Can create guest passes</label>
+            <div class="uk-form-controls">
+                <input class="uk-checkbox" id="can_create_guests" name="can_create_guests" type="checkbox" value="1"{if $edit_user.can_create_guests} checked{/if}>
+            </div>
+        </div>
+
 
         <div class="uk-margin">
             <div class="uk-form-label">Groups</div>

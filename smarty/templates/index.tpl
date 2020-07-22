@@ -337,6 +337,11 @@
         {if $permissions.entrance_smrckova}
         <div class="uk-width-1-3@l"><button name="action" id="open_entrance_smrckova_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_smrckova_options"><div class="single_open">Smrckova</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
+
+        {if $permissions.entrance_smrckova_river}
+        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_smrckova_river_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_smrckova_river_options"><div class="single_open">Riverside</div>{* <div class="camera"><img src="security-camera.svg" width="40" /></div> *}</button></div>
+        {/if}
+
         {if $permissions.z7b1}
             <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z7b1_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z7b1_options"><div class="single_open">Z7.B1</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
         {/if}
@@ -354,6 +359,10 @@
         {/if}
         {if $permissions.z9b2}
             <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z9b2_options"><div class="single_open">Z9.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
+        {/if}
+
+        {if $permissions.z8b1elevator}
+            <div class="uk-width-1-3@l"><button name="action" id="unlock_elevator_z8b1"type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_elevator_z8b1">Z8.B1 Elevator</button></div>
         {/if}
 
         {if $permissions.z9b1elevator}

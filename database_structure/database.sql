@@ -39,7 +39,7 @@ CREATE TABLE `action_queue` (
                                 KEY `action_queue_guests_id_fk` (`guest_id`),
                                 CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3056 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3223 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -60,7 +60,7 @@ CREATE TABLE `api_calls` (
                              KEY `api_calls_ip_index` (`ip`),
                              KEY `api_calls_time_index` (`time`),
                              CONSTRAINT `api_calls_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1217 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1226 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,7 +101,7 @@ CREATE TABLE `camera_log` (
                               KEY `camera_log_time_index` (`time`),
                               CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                               CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5124 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=5781 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,6 +151,7 @@ CREATE TABLE `groups` (
                           `z8b2` tinyint(4) NOT NULL DEFAULT 0,
                           `z9b1` tinyint(4) NOT NULL DEFAULT 0,
                           `z9b2` tinyint(4) NOT NULL DEFAULT 0,
+                          `z8b1elevator` tinyint(4) NOT NULL DEFAULT 0,
                           `z9b1elevator` tinyint(4) NOT NULL DEFAULT 0,
                           `z9b2elevator` tinyint(4) NOT NULL DEFAULT 0,
                           `z7garage` tinyint(4) NOT NULL DEFAULT 0,
@@ -159,10 +160,10 @@ CREATE TABLE `groups` (
                           `gate` tinyint(4) NOT NULL DEFAULT 0,
                           `entrance_menclova` tinyint(4) NOT NULL DEFAULT 0,
                           `entrance_smrckova` tinyint(4) NOT NULL DEFAULT 0,
-                          `timed_codes` tinyint(4) NOT NULL DEFAULT 0,
+                          `entrance_smrckova_river` tinyint(4) NOT NULL DEFAULT 0,
                           `admin` tinyint(4) NOT NULL DEFAULT 0,
                           PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -182,7 +183,7 @@ CREATE TABLE `guests` (
                           UNIQUE KEY `guests_hash_uindex` (`hash`),
                           KEY `guests_users_id_fk` (`user_id`),
                           CONSTRAINT `guests_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -203,7 +204,7 @@ CREATE TABLE `login_logs` (
                               PRIMARY KEY (`id`),
                               KEY `login_logs_users_id_fk` (`user_id`),
                               CONSTRAINT `login_logs_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=911 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=977 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -280,4 +281,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-21  2:37:57
+-- Dump completed on 2020-07-22 21:00:39

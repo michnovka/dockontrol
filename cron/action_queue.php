@@ -19,7 +19,7 @@ $actions_allowed = array(
 	'open_garage_z7', 'open_entrance_z7b1', 'open_entrance_z7b2',
 	'open_garage_z8',  'open_entrance_z8b1', 'open_entrance_z8b2',
 	'open_garage_z9',  'open_entrance_z9b1', 'open_entrance_z9b2',
-	'open_entrance_menclova', 'open_entrance_smrckova',
+	'open_entrance_menclova', 'open_entrance_smrckova', 'open_entrance_smrckova_river',
 	'unlock_elevator_z7b1', 'unlock_elevator_z7b2',
 	'unlock_elevator_z8b1', 'unlock_elevator_z8b2',
 	'unlock_elevator_z9b1', 'unlock_elevator_z9b2',
@@ -31,7 +31,7 @@ if(!empty($argv[1])){
 			$actions_allowed = array('open_gate');
 			break;
 		case 'entrances':
-			$actions_allowed = array('open_entrance_menclova', 'open_entrance_smrckova',);
+			$actions_allowed = array('open_entrance_menclova', 'open_entrance_smrckova', 'open_entrance_smrckova_river',);
 			break;
 		case 'z7':
 			$actions_allowed = array('open_garage_z7', 'open_entrance_z7b1', 'open_entrance_z7b2', 'unlock_elevator_z7b1', 'unlock_elevator_z7b2', );
@@ -84,6 +84,9 @@ while($minute_start == date('i')) {
 				case 'unlock_elevator_z9b1':
 					DoAction(5, 'PULSE', 100000);
 					break;
+				case 'unlock_elevator_z8b1':
+					DoActionRemote('192.168.1.194', 3, 'PULSE', 100000);
+					break;
 				case 'open_entrance_z9b1':
 					OWNOpenDoor(1);
 					break;
@@ -106,7 +109,11 @@ while($minute_start == date('i')) {
 					OWNOpenDoor(0);
 					break;
 				case 'open_entrance_smrckova':
-					OWNOpenDoor(3);
+					//OWNOpenDoor(3);
+					DoActionRemote('192.168.1.194', 1, 'PULSE', 100000);
+					break;
+				case 'open_entrance_smrckova_river':
+					DoActionRemote('192.168.1.194', 2, 'PULSE', 100000);
 					break;
 			}
 

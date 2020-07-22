@@ -14,7 +14,7 @@
         <hr/>
         Share this URL with your guests:
         <div class="uk-margin">
-            <input class="uk-input uk-form-width-large" type="text" value="{$success_link}" readonly>
+            <input class="uk-input" type="text" value="{$success_link}" onclick="this.setSelectionRange(0, this.value.length)" readonly>
         </div>
 
         <hr/>

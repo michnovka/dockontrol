@@ -33,14 +33,17 @@ function processAction($action, $user, $guest = null){
 
 				if(_check_permission('z9b2elevator', $user) && $user['apartment'] == 'Z9.B2.501'){
 					_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 45, $guest_id);
-					_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 60, $guest_id);
-					_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 75, $guest_id);
+					_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 100, $guest_id);
 				}
 
 				if(_check_permission('z9b1elevator', $user) && $user['apartment'] == 'Z9.B1.501'){
 					_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 45, $guest_id);
-					_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 60, $guest_id);
-					_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 75, $guest_id);
+					_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 100, $guest_id);
+				}
+
+				if(_check_permission('z8b1elevator', $user) && $user['apartment'] == 'Z8.B1.601'){
+					_add_to_action_queue('unlock_elevator_z8b1', $user['id'], time() + 45, $guest_id);
+					_add_to_action_queue('unlock_elevator_z8b1', $user['id'], time() + 100, $guest_id);
 				}
 
 				$message = 'Gate and garage opened';
@@ -54,7 +57,7 @@ function processAction($action, $user, $guest = null){
 			} else {
 				_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time(), $guest_id);
 				_add_to_action_queue('open_gate', $user['id'], time() + 23, $guest_id);
-				_add_to_action_queue('open_gate', $user['id'], time() + 27, $guest_id);
+				_add_to_action_queue('open_gate', $user['id'], time() + 28, $guest_id);
 				//sleep(1);
 				$message = 'Garage and gate opened';
 				$status = 'ok';
@@ -88,6 +91,7 @@ function processAction($action, $user, $guest = null){
 			}
 			break;
 
+		case 'unlock_elevator_z8b1':
 		case 'unlock_elevator_z9b1':
 		case 'unlock_elevator_z9b2':
 
@@ -160,6 +164,7 @@ function processAction($action, $user, $guest = null){
 			break;
 		case 'open_entrance_menclova':
 		case 'open_entrance_smrckova':
+		case 'open_entrance_smrckova_river':
 
 			preg_match('/^open_entrance_(.*)$/i', $action, $m);
 

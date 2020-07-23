@@ -70,6 +70,7 @@
     var pictureInterval = null;
 
     var picture_element;
+    var picture_element_loaded = false;
 
     function startPictureInterval(){
         clearInterval(pictureInterval);
@@ -83,9 +84,13 @@
 
                 clearInterval(pictureInterval);
                 picture_element.parent().find('.paused_container').show();
-            }else
-                picture_element.attr('src', picture_element.attr('src')+'1');
-        }, 4000);
+            }else {
+                if(picture_element_loaded) {
+                    picture_element_loaded = false;
+                    picture_element.attr('src', picture_element.attr('src') + '1');
+                }
+            }
+        }, 500);
     }
 
 
@@ -198,6 +203,10 @@
 
         open_garage_gate_modal = $('div#open_garage_gate_modal');
         picture_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture');
+        picture_element.on('load', function () {
+            picture_element_loaded = true;
+            console.log('loaded');
+        })
 
         setUpHooks('button.clickable,button.garage_gate_modal div.single_open');
         setUpHooksCamera('button.garage_gate_modal div.camera');

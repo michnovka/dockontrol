@@ -39,7 +39,7 @@ CREATE TABLE `action_queue` (
                                 KEY `action_queue_guests_id_fk` (`guest_id`),
                                 CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3223 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3268 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -84,6 +84,33 @@ CREATE TABLE `api_calls_failed` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `buttons`
+--
+
+DROP TABLE IF EXISTS `buttons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `buttons` (
+                           `id` varchar(63) NOT NULL,
+                           `type` enum('gate','entrance','elevator') NOT NULL DEFAULT 'entrance',
+                           `name` varchar(63) NOT NULL,
+                           `permission` varchar(63) NOT NULL DEFAULT '',
+                           `allow_1min_open` tinyint(4) NOT NULL DEFAULT 0,
+                           `camera1` varchar(63) DEFAULT NULL,
+                           `camera2` varchar(63) DEFAULT NULL,
+                           `sort_index` int(11) NOT NULL,
+                           PRIMARY KEY (`id`),
+                           KEY `button_cameras_name_id_fk` (`camera1`),
+                           KEY `button_cameras_name_id_fk_2` (`camera2`),
+                           KEY `button_permission_index` (`permission`),
+                           KEY `buttons_type_index` (`type`),
+                           KEY `buttons_order_index` (`sort_index`),
+                           CONSTRAINT `button_cameras_name_id_fk` FOREIGN KEY (`camera1`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+                           CONSTRAINT `button_cameras_name_id_fk_2` FOREIGN KEY (`camera2`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `camera_log`
 --
 
@@ -101,7 +128,7 @@ CREATE TABLE `camera_log` (
                               KEY `camera_log_time_index` (`time`),
                               CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                               CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5781 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=6529 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -117,6 +144,7 @@ CREATE TABLE `cameras` (
                            `data_jpg` longblob NOT NULL,
                            `stream_url` varchar(255) NOT NULL,
                            `stream_login` varchar(255) NOT NULL,
+                           `permission_required` varchar(63) NOT NULL,
                            PRIMARY KEY (`name_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -145,22 +173,22 @@ DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
                           `id` int(11) NOT NULL AUTO_INCREMENT,
                           `name` varchar(255) NOT NULL,
-                          `z7b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `z7b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `z8b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `z8b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `z9b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `z9b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `z8b1elevator` tinyint(4) NOT NULL DEFAULT 0,
-                          `z9b1elevator` tinyint(4) NOT NULL DEFAULT 0,
-                          `z9b2elevator` tinyint(4) NOT NULL DEFAULT 0,
-                          `z7garage` tinyint(4) NOT NULL DEFAULT 0,
-                          `z8garage` tinyint(4) NOT NULL DEFAULT 0,
-                          `z9garage` tinyint(4) NOT NULL DEFAULT 0,
-                          `gate` tinyint(4) NOT NULL DEFAULT 0,
-                          `entrance_menclova` tinyint(4) NOT NULL DEFAULT 0,
-                          `entrance_smrckova` tinyint(4) NOT NULL DEFAULT 0,
-                          `entrance_smrckova_river` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z7b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z7b2` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z8b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z8b2` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z9b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z9b2` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_elevator_z8b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_elevator_z9b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_elevator_z9b2` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_garage_z7` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_garage_z8` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_garage_z9` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_gate` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_menclova` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_smrckova` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_smrckova_river` tinyint(4) NOT NULL DEFAULT 0,
                           `admin` tinyint(4) NOT NULL DEFAULT 0,
                           PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
@@ -204,7 +232,7 @@ CREATE TABLE `login_logs` (
                               PRIMARY KEY (`id`),
                               KEY `login_logs_users_id_fk` (`user_id`),
                               CONSTRAINT `login_logs_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=977 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=985 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -281,4 +309,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-22 21:00:39
+-- Dump completed on 2020-07-23  2:32:36

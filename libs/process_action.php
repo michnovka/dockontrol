@@ -24,24 +24,24 @@ function processAction($action, $user, $guest = null){
 
 		case 'enter':
 			// gate, 10sec sleep, garage
-			if(!_check_permission('gate', $user) || !_check_permission($user['default_garage'].'garage', $user)){
+			if(!_check_permission('gate', $user) || !_check_permission('garage_'.$user['default_garage'], $user)){
 				$message = 'Not authorized';
 			} else {
 				_add_to_action_queue('open_gate', $user['id'], time(), $guest_id);
 				_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time() + 10, $guest_id);
 				//sleep(1);
 
-				if(_check_permission('z9b2elevator', $user) && $user['apartment'] == 'Z9.B2.501'){
+				if(_check_permission('elevator_z9b2', $user) && $user['apartment'] == 'Z9.B2.501'){
 					_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 45, $guest_id);
 					_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 100, $guest_id);
 				}
 
-				if(_check_permission('z9b1elevator', $user) && $user['apartment'] == 'Z9.B1.501'){
+				if(_check_permission('elevator_z9b1', $user) && $user['apartment'] == 'Z9.B1.501'){
 					_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 45, $guest_id);
 					_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 100, $guest_id);
 				}
 
-				if(_check_permission('z8b1elevator', $user) && $user['apartment'] == 'Z8.B1.601'){
+				if(_check_permission('elevator_z8b1', $user) && $user['apartment'] == 'Z8.B1.601'){
 					_add_to_action_queue('unlock_elevator_z8b1', $user['id'], time() + 45, $guest_id);
 					_add_to_action_queue('unlock_elevator_z8b1', $user['id'], time() + 100, $guest_id);
 				}
@@ -52,7 +52,7 @@ function processAction($action, $user, $guest = null){
 			break;
 
 		case 'exit':
-			if(!_check_permission('gate', $user) || !_check_permission($user['default_garage'].'garage', $user)){
+			if(!_check_permission('gate', $user) || !_check_permission('garage_'.$user['default_garage'], $user)){
 				$message = 'Not authorized';
 			} else {
 				_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time(), $guest_id);
@@ -98,7 +98,7 @@ function processAction($action, $user, $guest = null){
 			preg_match('/^unlock_elevator_(z[0-9]b[0-9])$/', $action, $m);
 
 			// elevator
-			if(!_check_permission($m[1].'elevator', $user)){
+			if(!_check_permission('elevator_'.$m[1], $user)){
 				$message = 'Not authorized';
 			} else {
 				_add_to_action_queue('unlock_elevator_'.$m[1], $user['id'], time(), $guest_id);
@@ -121,7 +121,7 @@ function processAction($action, $user, $guest = null){
 			$garage_1min = !!$m[2];
 
 			// garage z9
-			if(!_check_permission('z'.$garage_number.'garage', $user)){
+			if(!_check_permission('garage_z'.$garage_number, $user)){
 				$message = 'Not authorized';
 			} else {
 
@@ -149,19 +149,6 @@ function processAction($action, $user, $guest = null){
 		case 'open_entrance_z8b2':
 		case 'open_entrance_z9b1':
 		case 'open_entrance_z9b2':
-
-			preg_match('/^open_entrance_(z[0-9]b[0-9])$/i', $action, $m);
-
-			$entrance_name = $m[1];
-
-			if(!_check_permission($entrance_name, $user)){
-				$message = 'Not authorized';
-			} else {
-				_add_to_action_queue($action, $user['id'], time(), $guest_id);
-				$message = 'Entrance opened';
-				$status = 'ok';
-			}
-			break;
 		case 'open_entrance_menclova':
 		case 'open_entrance_smrckova':
 		case 'open_entrance_smrckova_river':

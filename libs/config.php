@@ -66,22 +66,22 @@ function _get_permissions($user_id = null, $ignore_admin = true)
 
 	$_SESSION['permissions'] = $db->queryfirst('SELECT
 		   MAX(g.admin) as admin,
-		   MAX(g.z7b1) as z7b1,
-		   MAX(g.z7b2) as z7b2,
-		   MAX(g.z8b1) as z8b1,
-		   MAX(g.z8b2) as z8b2,
-		   MAX(g.z9b1) as z9b1,
-		   MAX(g.z9b2) as z9b2,
-		   MAX(g.z9b2elevator) as z9b2elevator,
-		   MAX(g.z9b1elevator) as z9b1elevator,
-		   MAX(g.z8b1elevator) as z8b1elevator,
-		   MAX(g.z7garage) as z7garage,
-		   MAX(g.z8garage) as z8garage,
-		   MAX(g.z9garage) as z9garage,
-		   MAX(g.gate) as gate,
-		   MAX(g.entrance_menclova) as entrance_menclova,
-		   MAX(g.entrance_smrckova) as entrance_smrckova,
-		   MAX(g.entrance_smrckova_river) as entrance_smrckova_river
+		   MAX(g.permission_entrance_z7b1) as entrance_z7b1,
+		   MAX(g.permission_entrance_z7b2) as entrance_z7b2,
+		   MAX(g.permission_entrance_z8b1) as entrance_z8b1,
+		   MAX(g.permission_entrance_z8b2) as entrance_z8b2,
+		   MAX(g.permission_entrance_z9b1) as entrance_z9b1,
+		   MAX(g.permission_entrance_z9b2) as entrance_z9b2,
+		   MAX(g.permission_elevator_z8b1) as elevator_z8b1,
+		   MAX(g.permission_elevator_z9b1) as elevator_z9b1,
+		   MAX(g.permission_elevator_z9b2) as elevator_z9b2,
+		   MAX(g.permission_garage_z7) as garage_z7,
+		   MAX(g.permission_garage_z8) as garage_z8,
+		   MAX(g.permission_garage_z9) as garage_z9,
+		   MAX(g.permission_gate) as gate,
+		   MAX(g.permission_entrance_menclova) as entrance_menclova,
+		   MAX(g.permission_entrance_smrckova) as entrance_smrckova,
+		   MAX(g.permission_entrance_smrckova_river) as entrance_smrckova_river
 		FROM `groups` g INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=#'.($ignore_admin ? ' AND g.id != 1' : ''), $user_id);
 
 	if($ignore_admin)

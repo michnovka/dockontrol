@@ -46,6 +46,20 @@ if(empty($_GET['guest'])) {
 $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions($user['id'], !array_key_exists('admin', $_GET)));
 
+
+$gates = array();
+$db->queryall('SELECT * FROM buttons WHERE type=\'gate\' ORDER BY sort_index', $gates);
+
+$entrances = array();
+$db->queryall('SELECT * FROM buttons WHERE type=\'entrance\' ORDER BY sort_index', $entrances);
+
+$elevators = array();
+$db->queryall('SELECT * FROM buttons WHERE type=\'elevator\' ORDER BY sort_index', $elevators);
+
+$smarty->assign('gates', $gates);
+$smarty->assign('entrances', $entrances);
+$smarty->assign('elevators', $elevators);
+
 $smarty->assign('admin_limited_view', !array_key_exists('admin', $_GET));
 
 $smarty->display('index.tpl');

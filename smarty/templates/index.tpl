@@ -68,9 +68,8 @@
     var clicksWithoutAction = 0;
 
     var pictureInterval = null;
-    var pictureInterval2 = null;
 
-    var picture_element,picture2_element;
+    var picture_element;
 
     function startPictureInterval(){
         clearInterval(pictureInterval);
@@ -89,22 +88,6 @@
         }, 4000);
     }
 
-    function startPictureInterval2(){
-        clearInterval(pictureInterval2);
-
-        pictureInterval2 = window.setInterval(function () {
-            console.log('interval2');
-
-            if(isCurrentWindowHidden || picture2_element.is(':hidden') || !picture2_element.is(':visible')) {
-                console.log('clearinterval2');
-                clearInterval(pictureInterval2);
-                if(!picture2_element.is(':hidden') && picture2_element.is(':visible')) {
-                    picture2_element.parent().find('.paused_container').show();
-                }
-            }else
-                picture2_element.attr('src', picture2_element.attr('src')+'1');
-        }, 4000);
-    }
 
     function setUpHooksCamera(element){
 
@@ -114,7 +97,13 @@
             var button_id = button_element.attr('id');
 
             var new_button_id = button_id.replace(/_options/g,'');
-            var camera_id = new_button_id.replace(/open_/g,'');
+
+            var img_element = $(this).find('img');
+
+            var camera1_id = img_element.data('camera1');
+            var camera2_id = img_element.data('camera2');
+
+            var allow_1min_open = img_element.data('allow1min');
 
             $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button').attr('id', new_button_id);
 
@@ -122,20 +111,15 @@
 
             $(open_garage_gate_modal).find('h2#open_garage_gate_modal_title').text('Open ' + $(this).parent().find('div.single_open').text());
 
-            picture_element.attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera_id+'&now'+Date.now());
+            picture_element.attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera1_id+(!!camera2_id ? '&camera2='+camera2_id : '')+'&now'+Date.now());
             picture_element.parent().find('.paused_container').hide();
 
             startPictureInterval();
 
-            picture2_element.parent().find('.paused_container').hide();
-
-            if(button_element.hasClass('entrance')){
-                picture2_element.hide();
-                button_open_1min_element.hide();
-            }else{
-                picture2_element.show().attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera_id+'_in&now'+Date.now());
+            if(!!allow_1min_open){
                 button_open_1min_element.show().attr('id', new_button_id+'_1min');
-                startPictureInterval2();
+            }else{
+                button_open_1min_element.hide();
             }
 
             var modal = UIkit.modal(open_garage_gate_modal);
@@ -214,7 +198,6 @@
 
         open_garage_gate_modal = $('div#open_garage_gate_modal');
         picture_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture');
-        picture2_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture2');
 
         setUpHooks('button.clickable,button.garage_gate_modal div.single_open');
         setUpHooksCamera('button.garage_gate_modal div.camera');
@@ -228,11 +211,7 @@
 
                 pausedContainerElement.show();
 
-                if (imageElement.attr('id') === 'open_garage_gate_modal_camera_picture') {
-                    clearInterval(pictureInterval);
-                }else{
-                    clearInterval(pictureInterval2);
-                }
+                clearInterval(pictureInterval);
 
             } else {
 
@@ -240,11 +219,7 @@
 
                 pausedContainerElement.hide();
 
-                if (imageElement.attr('id') === 'open_garage_gate_modal_camera_picture') {
-                    startPictureInterval();
-                } else {
-                    startPictureInterval2();
-                }
+                startPictureInterval();
             }
         });
 
@@ -312,66 +287,26 @@
 
         <div class="uk-width-1-1"><h4 class="uk-h4">Gates</h4></div>
 
-        {if $permissions.gate}
-            <div class="uk-width-1-2@l"><button id="open_gate_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Gate</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-        {if $permissions.z9garage}
-            <div class="uk-width-1-2@l"><button id="open_garage_z9_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Garage Z9</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button>
-            </div>
-        {/if}
-
-
-        {if $permissions.z8garage}
-            <div class="uk-width-1-2@l"><button id="open_garage_z8_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Garage Z8</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-
-        {if $permissions.z7garage}
-        <div class="uk-width-1-2@l"><button id="open_garage_z7_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">Garage Z7</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
+        {section name=g loop=$gates}
+            {if $permissions[$gates[g].permission]}
+                <div class="uk-width-1-2@l"><button id="open_{$gates[g].id}_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">{$gates[g].name}</div>{if $gates[g].camera1}<div class="camera"><img src="security-camera.svg" width="40" data-camera1="{$gates[g].camera1}" data-camera2="{$gates[g].camera2}"{if $gates[g].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
+            {/if}
+        {/section}
 
         <div class="uk-width-1-1"><h4 class="uk-h4">Entrances</h4></div>
 
-        {if $permissions.entrance_menclova}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_menclova_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_menclova_options"><div class="single_open">Menclova</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-        {if $permissions.entrance_smrckova}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_smrckova_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_smrckova_options"><div class="single_open">Smrckova</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
+        {section name=e loop=$entrances}
+            {if $permissions[$entrances[e].permission]}
+                <div class="uk-width-1-3@l"><button id="open_{$entrances[e].id}_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">{$entrances[e].name}</div>{if $entrances[e].camera1}<div class="camera"><img src="security-camera.svg" width="40" data-camera1="{$entrances[e].camera1}" data-camera2="{$entrances[e].camera2}"{if $entrances[e].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
+            {/if}
+        {/section}
 
-        {if $permissions.entrance_smrckova_river}
-        <div class="uk-width-1-3@l"><button name="action" id="open_entrance_smrckova_river_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_smrckova_river_options"><div class="single_open">Riverside</div>{* <div class="camera"><img src="security-camera.svg" width="40" /></div> *}</button></div>
-        {/if}
+        {section name=el loop=$elevators}
+            {if $permissions[$elevators[el].permission]}
+                <div class="uk-width-1-3@l"><button name="action" id="unlock_{$elevators[el].id}" type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_{$elevators[el].id}">{$elevators[el].name}</button></div>
+            {/if}
+        {/section}
 
-        {if $permissions.z7b1}
-            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z7b1_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z7b1_options"><div class="single_open">Z7.B1</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-        {if $permissions.z7b2}
-            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z7b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z7b2_options"><div class="single_open">Z7.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-        {if $permissions.z8b1}
-            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z8b1_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z8b1_options"><div class="single_open">Z8.B1</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-        {if $permissions.z8b2}
-            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z8b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z8b2_options"><div class="single_open">Z8.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-        {if $permissions.z9b1}
-            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b1_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z9b1_options"><div class="single_open">Z9.B1</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-        {if $permissions.z9b2}
-            <div class="uk-width-1-3@l"><button name="action" id="open_entrance_z9b2_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1" value="open_entrance_z9b2_options"><div class="single_open">Z9.B2</div><div class="camera"><img src="security-camera.svg" width="40" /></div></button></div>
-        {/if}
-
-        {if $permissions.z8b1elevator}
-            <div class="uk-width-1-3@l"><button name="action" id="unlock_elevator_z8b1"type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_elevator_z8b1">Z8.B1 Elevator</button></div>
-        {/if}
-
-        {if $permissions.z9b1elevator}
-            <div class="uk-width-1-3@l"><button name="action" id="unlock_elevator_z9b1"type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_elevator_z9b1">Z9.B1 Elevator</button></div>
-        {/if}
-
-        {if $permissions.z9b2elevator}
-            <div class="uk-width-1-3@l"><button name="action" id="unlock_elevator_z9b2"type="button" class="uk-button uk-button-large uk-button-default uk-width-1-1 clickable" value="unlock_elevator_z9b2">Z9.B2 Elevator</button></div>
-        {/if}
 
     </div>
 
@@ -391,10 +326,6 @@
                 {if $user.has_camera_access}
                 <div class="uk-width-1-1 picture_container">
                     <img src="loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture" />
-                    <div class="paused_container"><img src="pause.svg" width="80" /></div>
-                </div>
-                <div class="uk-width-1-1 picture_container">
-                    <img src="loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture2" />
                     <div class="paused_container"><img src="pause.svg" width="80" /></div>
                 </div>
                 {/if}

@@ -1,3 +1,6 @@
 [submodule "openwebnet-php"]
 	path = openwebnet-php
 	url = https://github.com/michnovka/openwebnet-php.git
+[submodule "WebAuthn"]
+	path = WebAuthn
+	url = https://github.com/lbuchs/WebAuthn

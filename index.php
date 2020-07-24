@@ -35,8 +35,27 @@ if(!empty($_POST['action'])){
 	if(!empty($_POST['pin']))
 		$pin = $_POST['pin'];
 
-	$result = processAction($_POST['action'], $user, $guest, $totp, $pin);
+	$result = array('status' => 'error');
 
+	if($_POST['action'] == 'check_pin') {
+		$nuki = $db->queryfirst('SELECT * FROM nuki WHERE user_id=# AND id=# LIMIT 1', $user['id'], $_POST['nuki_id']);
+
+		if(empty($nuki)){
+			$result['status'] = 'error';
+			$result['message'] = 'Unauthorized';
+		}elseif(intval($db->fetch('SELECT COUNT(*) FROM nuki_logs WHERE status=\'incorrect_pin\' AND time > DATE_SUB(NOW(), INTERVAL 5 MINUTE) AND nuki_id=#', $nuki['id'])) > 5){
+			$result['status'] = 'error';
+			$result['message'] = 'Too many PIN attempts. Try in 5 mins';
+		}elseif(!$nuki['pin'] || $nuki['pin'] != $pin){
+			$result['status'] = 'error';
+			$result['message'] = 'Incorrect PIN';
+			$db->query('INSERT INTO nuki_logs SET time=NOW(), nuki_id=#, status=\'incorrect_pin\', action=?', $nuki['id'], 'pin_check');
+		}else{
+			$result['status'] = 'ok';
+		}
+	}else {
+		$result = processAction($_POST['action'], $user, $guest, $totp, $pin);
+	}
 	die(json_encode($result));
 }
 

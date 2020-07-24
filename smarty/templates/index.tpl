@@ -1,11 +1,130 @@
 {include file="header.tpl"}
+<script src="resources/base32.min.js" type="text/javascript"></script>
+<script src="resources/jsTOTP.min.js" type="text/javascript"></script>
 
 <script type="text/javascript">
+
+    function hexToString(hex) {
+        if (!hex.match(/^[0-9a-fA-F]+$/)) {
+            throw new Error('is not a hex string.');
+        }
+        if (hex.length % 2 !== 0) {
+            hex = '0' + hex;
+        }
+        var bytes = [];
+        for (var n = 0; n < hex.length; n += 2) {
+            var code = parseInt(hex.substr(n, 2), 16)
+            bytes.push(code);
+        }
+        return bytes;
+    }
+
+    function sha256(str) {
+        // Get the string as arraybuffer.
+        var buffer = new TextEncoder("utf-8").encode(str)
+        return crypto.subtle.digest("SHA-256", buffer).then(function(hash) {
+            return hex(hash)
+        })
+    }
+
+    function hex(buffer) {
+        var digest = ''
+        var view = new DataView(buffer)
+        for(var i = 0; i < view.byteLength; i += 4) {
+            // We use getUint32 to reduce the number of iterations (notice the `i += 4`)
+            var value = view.getUint32(i)
+            // toString(16) will transform the integer into the corresponding hex string
+            // but will remove any initial "0"
+            var stringValue = value.toString(16)
+            // One Uint32 element is 4 bytes or 8 hex chars (it would also work with 4
+            // chars for Uint16 and 2 chars for Uint8)
+            var padding = '00000000'
+            var paddedValue = (padding + stringValue).slice(-padding.length)
+            digest += paddedValue
+        }
+
+        return digest
+    }
+
+    var pin_modal = null;
+    var pin_modal_pin_value = null;
+    var pin_modal_pin_value_display = null;
+
+    function askForPin(callback) {
+        // get modal
+
+        // reset PIN code
+        pin_modal_pin_value_display.text('');
+        pin_modal_pin_value.val('');
+
+        var modal = UIkit.modal(pin_modal);
+
+        // add event on submit click
+        pin_modal.find('button#pin_submit').unbind('click').bind('click', function(){
+            var pin = pin_modal.find('input#pin_value').val();
+            callback(pin);
+
+            modal.hide();
+        });
+
+        modal.show();
+    }
 
     var lastTimeout = null;
     var stopTimer = false;
 
-    function doAction(what, element, isInModal, reSetUpHooks){
+    function doAction(what, element, isInModal, reSetUpHooks, pin, totp){
+
+        if($(element).hasClass('nuki')){
+
+            console.log('nuki');
+            var nuki_id = what.replace(/^nuki_(un)?lock_/g, '');
+
+            if(!pin){
+                // check if we need pin
+                var nuki_pin_required = localStorage.getItem('nuki_' + nuki_id + '_pin_required');
+
+                if(nuki_pin_required){
+                    askForPin(function(pinCode){
+                        doAction(what, element, isInModal, reSetUpHooks, pinCode);
+                    });
+                    return;
+                }else{
+                    // go on with no PIN
+                }
+
+            }
+
+            if(!totp) {
+
+                var nuki_password = localStorage.getItem('nuki_' + nuki_id + '_password');
+
+                if (!nuki_password) {
+
+                    nuki_password = window.prompt('Please enter password for this NUKI device:');
+                    if (!!nuki_password)
+                        localStorage.setItem('nuki_' + nuki_id + '_password', nuki_password);
+                    else
+                        return;
+                }
+
+                if (!nuki_password)
+                    return;
+
+                sha256(nuki_password).then(function (digest) {
+                    var secret = base32.encode(hexToString(digest.substr(0, 20)));
+
+                    var totp = new jsOTP.totp();
+                    var timeCode = totp.getOtp(secret);
+
+                    doAction(what, element, isInModal, reSetUpHooks, pin, timeCode);
+                });
+
+                return;
+            }
+
+        }
+
         var actionResultSelector = $('div#action_result');
 
         if(isInModal)
@@ -18,7 +137,8 @@
 
         what = what.replace(/_options/g,'');
 
-        $.post(window.location.self, { action : what }, function(data){
+
+        $.post(window.location.self, { action : what, totp: totp, pin: pin }, function(data){
             $(actionResultSelector).find('p').text(data.message);
 
             var doNotHideActionResult = false;
@@ -33,6 +153,11 @@
                     window.navigator.vibrate(100);
 
             }else{
+                if(data.status === 'pin_required'){
+                    var nuki_id = what.replace(/^nuki_(un)?lock_/g, '');
+                    localStorage.setItem('nuki_' + nuki_id + '_pin_required', true);
+                }
+
                 $(actionResultSelector).removeClass('uk-alert-success').addClass('uk-alert-danger').show(200);
             }
 
@@ -41,18 +166,35 @@
                 setTimeout(function(){ $(actionResultSelector).hide(200);}, 3000);
 
                 setTimeout(function(){
-                    $(element).removeClass('spinner').html($(element).data('original')).prop('disabled', $(element).data('originalDisabled')).attr('id', $(element).data('originalId')).removeClass('success');
+                    $(element).removeClass('spinner').html($(element).data('original')).prop('disabled', $(element).data('originalDisabled')).attr('id', $(element).data('originalId')).removeClass('success').removeClass('error');
                     if(reSetUpHooks) {
                         setUpHooks($(element).find('div.single_open'));
                         setUpHooksCamera($(element).find('div.camera'));
                     }
                 }, 2000);
 
-                $(element).html('<svg id="successAnimation" class="animated" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 70 70">' +
+                var success_svg = '<svg id="successAnimation" class="animated" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 70 70">' +
                     '  <path id="successAnimationResult" fill="#D8D8D8" d="M35,60 C21.1928813,60 10,48.8071187 10,35 C10,21.1928813 21.1928813,10 35,10 C48.8071187,10 60,21.1928813 60,35 C60,48.8071187 48.8071187,60 35,60 Z M23.6332378,33.2260427 L22.3667622,34.7739573 L34.1433655,44.40936 L47.776114,27.6305926 L46.223886,26.3694074 L33.8566345,41.59064 L23.6332378,33.2260427 Z"/>' +
                     '  <circle id="successAnimationCircle" cx="35" cy="35" r="24" stroke="#979797" stroke-width="2" stroke-linecap="round" fill="transparent"/>' +
                     '  <polyline id="successAnimationCheck" stroke="#979797" stroke-width="2" points="23 34 34 43 47 27" fill="transparent"/>' +
-                    '</svg>').removeClass('active').addClass('success');
+                    '</svg>';
+
+                var error_svg = '<svg  viewBox="0 0 87 87" version="1.1"  width="35" height="35" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
+                    '<g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">' +
+                    '<g id="Group-2" transform="translate(2.000000, 2.000000)">' +
+                    '<circle id="Oval-2" stroke="rgba(252, 68, 68, 0.5)" stroke-width="4" cx="41.5" cy="41.5" r="41.5"></circle>' +
+                    '<circle  class="ui-error-circle" stroke="#F74444" stroke-width="4" cx="41.5" cy="41.5" r="41.5"></circle>' +
+                    '<path class="ui-error-line1" d="M22.244224,22 L60.4279902,60.1837662" id="Line" stroke="#F74444" stroke-width="3" stroke-linecap="square"></path>' +
+                    '<path class="ui-error-line2" d="M60.755776,21 L23.244224,59.8443492" id="Line" stroke="#F74444" stroke-width="3" stroke-linecap="square"></path>' +
+                    '</g>' +
+                    '</g>' +
+                    '</svg>';
+
+                if(data.status === 'ok') {
+                    $(element).html(success_svg).removeClass('active').addClass('success');
+                }else{
+                    $(element).html(error_svg).removeClass('active').addClass('error');
+                }
             }
         }, 'json');
 
@@ -199,7 +341,13 @@
 
     }
 
+    var PINMaskTimeout = null;
+
     $(document).ready(function(){
+
+        pin_modal = $('div#modal-pin');
+        pin_modal_pin_value_display = pin_modal.find('h1#pin_value_display');
+        pin_modal_pin_value = pin_modal.find('input#pin_value');
 
         open_garage_gate_modal = $('div#open_garage_gate_modal');
         picture_element = $(open_garage_gate_modal).find('img#open_garage_gate_modal_camera_picture');
@@ -207,6 +355,29 @@
             picture_element_loaded = true;
             console.log('loaded');
         })
+
+        pin_modal.find('button.pin_digit').click(function () {
+            clearInterval(PINMaskTimeout);
+            PINMaskTimeout = null;
+
+            // add to PIN value and display
+            var digit = $(this).text();
+            var current_text = pin_modal_pin_value_display.text();
+
+            pin_modal_pin_value_display.text("*".repeat(current_text.length) + digit);
+            pin_modal_pin_value.val(pin_modal_pin_value.val() + digit);
+
+            PINMaskTimeout = setTimeout(function(){
+                pin_modal_pin_value_display.text("*".repeat(pin_modal_pin_value_display.text().length));
+            }, 1000);
+
+        });
+
+        pin_modal.find('button#pin_delete').click(function () {
+            // add to PIN value and display
+            pin_modal_pin_value_display.text(pin_modal_pin_value_display.text().slice(0,-1));
+            pin_modal_pin_value.val(pin_modal_pin_value.val().slice(0,-1));
+        });
 
         setUpHooks('button.clickable,button.garage_gate_modal div.single_open');
         setUpHooksCamera('button.garage_gate_modal div.camera');
@@ -317,6 +488,18 @@
         {/section}
 
 
+        {if $nuki}
+        <div class="uk-width-1-1"><h4 class="uk-h4">NUKI</h4></div>
+
+        {section name=n loop=$nuki}
+            <div class="uk-width-1-2@l"><button name="action" id="nuki_unlock_{$nuki[n].id}" type="button" class="uk-button uk-button-primary uk-button-large uk-button-default uk-width-1-1 clickable nuki" value="nuki_unlock_{$nuki[n].id}">Unlock {$nuki[n].name}</button></div>
+            {if $nuki[n].can_lock}
+                <div class="uk-width-1-2@l"><button name="action" id="nuki_lock_{$nuki[n].id}" type="button" class="uk-button uk-button-danger uk-button-large uk-button-default uk-width-1-1 clickable nuki" value="nuki_lock_{$nuki[n].id}">Lock {$nuki[n].name}</button></div>
+            {/if}
+        {/section}
+
+        {/if}
+
     </div>
 
 </div>
@@ -341,6 +524,29 @@
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_dummy_button" type="button" class="open_garage_gate_dummy_button uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">SINGLE OPEN</button></div>
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_1min_dummy_button" type="button" class="open_garage_gate_1min_dummy_button uk-button uk-button-large uk-button-danger uk-width-1-1 clickable clickable_modal" value="">OPEN FOR 1 MIN</button></div>
             </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="modal-pin" class="uk-flex-top" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <h1 class="uk-text-center" id="pin_value_display" style="min-height: 3.5rem;"></h1>
+        <input type="hidden" id="pin_value" />
+        <div class="uk-grid-small uk-text-center uk-grid-row-small" uk-grid>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">1</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">2</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">3</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">4</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">5</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">6</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">7</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">8</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">9</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-danger uk-width-1-1" id="pin_delete">DEL</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-default uk-width-1-1 pin_digit">0</button></div>
+            <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-primary uk-width-1-1" id="pin_submit">OK</button></div>
         </div>
     </div>
 </div>

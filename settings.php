@@ -60,6 +60,10 @@ $user = _get_user_array();
 $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions());
 
+$nukis = array();
+$db->queryall('SELECT * FROM nuki WHERE user_id=#', $nukis,'', $user['id']);
+$smarty->assign('nukis', $nukis);
+
 $smarty->display('settings.tpl');
 
 ?>

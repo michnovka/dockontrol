@@ -1,6 +1,6 @@
 {include file="header.tpl" title="Settings"}
 
-<div class="uk-container uk-container-small uk-container-center uk-text-center">
+<div class="uk-container uk-container-medium uk-container-center uk-text-center">
 
     <h2 class="uk-heading-line uk-margin-small uk-margin-small-top uk-text-center"><span>Settings</span></h2>
 
@@ -52,22 +52,50 @@
 
 </div>
 
+<div class="uk-container uk-container-medium uk-container-center uk-text-center uk-padding-large">
 
-<div id="open_garage_z9_modal" class="uk-flex-top" uk-modal>
-    <div class="uk-modal-dialog uk-margin-auto-vertical uk-padding-medium">
-        <div class="uk-modal-header">
-            <h2 class="uk-modal-title">Open Garage</h2>
-        </div>
-        <div class="uk-modal-body">
-            <div class="uk-alert-success uk-text-center uk-margin-medium notify_modal" style="display:none;" uk-alert>
-                <p></p>
-            </div>
-            <div class="uk-grid-small uk-text-center uk-grid-row-small" uk-grid>
-                <div class="uk-width-1-2@l"><button name="action" id="open_garage_z9" type="button" class="uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="enter">SINGLE OPEN</button></div>
-                <div class="uk-width-1-2@l"><button name="action" id="open_garage_z9_1min" type="button" class="uk-button uk-button-large uk-button-danger uk-width-1-1 clickable clickable_modal" value="exit">OPEN FOR 1 MIN</button></div>
-            </div>
-        </div>
-    </div>
+    <h3 class="uk-heading-line uk-margin-small uk-margin-small-top uk-text-center"><span>NUKI</span></h3>
+    <p>You can add NUKI devices using <a href="https://github.com/michnovka/dockontrol-nuki-api">dockontrol-nuki-api</a> bridge to your CP.</p>
+    <p>Security is achieved through 2 passwords - one password is stored on the server and second password is saved in browser local cache. The passwords are used to generate TOTP codes, therefore not even the provider of the server is able to issue lock/unlock commands to your NUKI. Intercepting communication (which should be over HTTPS anyways) would only allow attacker to only unlock/lock door during the same 1 minute interval.</p>
+    <p>In order to protect against stolen mobile devices, NUKI commands can be further protected with PIN code. This code will be required with every lock/unlock command and is rate-limited.</p>
+
+    <table class="uk-table uk-table-striped uk-table-hover uk-table-small">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nuki Name</th>
+                <th>API URL</th>
+                <th>Username</th>
+                <th>Password1</th>
+                <th>Password2</th>
+                <th>PIN</th>
+                <th>Can lock?</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {section name=n loop=$nukis}
+            <tr>
+                <td>#{$nukis[n].id}</td>
+                <td>{$nukis[n].name}</td>
+                <td>{$nukis[n].dockontrol_nuki_api_server}</td>
+                <td>{$nukis[n].username}</td>
+                <td>{if $nukis[n].password1}SET{else}NOT SET{/if}</td>
+                <td><script type="text/javascript">if(localStorage.getItem('nuki_{$nukis[n].id}_password')) document.write('SET'); else document.write('NOT SET');</script></td>
+                <td>{if $nukis[n].pin === null}NOT SET{else}SET{/if}</td>
+                <td>{if $nukis[n].can_lock}YES{else}NO{/if}</td>
+                <td><a class="uk-button uk-button-default uk-button-small" href="nuki_edit.php?id={$nukis[n].id}" title="Edit {$nukis[n].name}">Edit</a></td>
+            </tr>
+            {sectionelse}
+                <tr>
+                    <td colspan="8">No NUKIs at the moment</td>
+                </tr>
+            {/section}
+        </tbody>
+    </table>
+
+    <a class="uk-button uk-button-primary uk-width-1-1" href="nuki_edit.php">Add new NUKI</a>
+
 </div>
 
 

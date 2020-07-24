@@ -50,6 +50,23 @@ function _check_permission($permission, $user = null)
 
 	return $_SESSION['permissions'][$permission] == 1;
 }
+/**
+ * @param int $nuki_id
+ * @param null|array $user
+ * @return bool
+ * @throws EDatabase
+ */
+function _check_nuki_permission($nuki_id, $user = null)
+{
+	global $db;
+	$user_id = $_SESSION['id'];
+
+	if(!empty($user))
+		$user_id = $user['id'];
+
+	return $db->fetch('SELECT 1 FROM nuki WHERE user_id=# AND id=# LIMIT 1', $user_id, $nuki_id) ? true : false;
+}
+
 
 /**
  * @param null|int $user_id

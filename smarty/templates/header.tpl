@@ -147,6 +147,49 @@
             animation: 0.3s linear 0.9s both fadeIn;
         }
 
+
+        .ui-error-circle {
+            stroke-dasharray: 260.75219025px, 260.75219025px;
+            stroke-dashoffset: 260.75219025px;
+            animation: ani-error-circle 1.2s linear;
+        }
+        .ui-error-line1 {
+            stroke-dasharray: 54px 55px;
+            stroke-dashoffset: 55px;
+            stroke-linecap: round;
+            animation: ani-error-line 0.15s 1.2s linear both;
+        }
+        .ui-error-line2 {
+            stroke-dasharray: 54px 55px;
+            stroke-dashoffset: 55px;
+            stroke-linecap: round;
+            animation: ani-error-line 0.2s 0.9s linear both;
+        }
+        @keyframes ani-error-line {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        @keyframes ani-error-circle {
+            0% {
+                stroke-dasharray: 0, 260.75219025px;
+                stroke-dashoffset: 0;
+            }
+            35% {
+                stroke-dasharray: 120px, 120px;
+                stroke-dashoffset: -120px;
+            }
+            70% {
+                stroke-dasharray: 0, 260.75219025px;
+                stroke-dashoffset: -260.75219025px;
+            }
+            100% {
+                stroke-dasharray: 260.75219025px, 0;
+                stroke-dashoffset: -260.75219025px;
+            }
+        }
+
+
         #replay {
             background: rgba(255, 255, 255, 0.2);
             border: 0;
@@ -176,11 +219,15 @@
             background-color: #70c22d;
         }
 
+        button.clickable.error,button.garage_gate_modal.error{
+            background-color: #ffffff;
+        }
+
         .uk-modal-title {
             font-size: 1.4rem;
         }
 
-        button.garage_gate_modal.success {
+        button.garage_gate_modal.success,button.garage_gate_modal.error {
             padding: 0;
         }
 

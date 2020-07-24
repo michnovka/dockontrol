@@ -39,6 +39,7 @@ if(!empty($_POST['action'])){
 		}
 
 		$edit_user['email'] = htmlspecialchars($_POST['email']);
+		$edit_user['apartment'] = htmlspecialchars($_POST['apartment']);
 
 		//eliminate every char except 0-9
 		$_POST['phone'] = preg_replace("/[^0-9]/", '', $_POST['phone']);

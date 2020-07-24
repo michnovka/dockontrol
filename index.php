@@ -26,7 +26,16 @@ if(!empty($_POST['action'])){
 		$user['has_camera_access'] = 0;
 	}
 
-	$result = processAction($_POST['action'], $user, $guest);
+	$totp = null;
+	$pin = null;
+
+	if(!empty($_POST['totp']))
+		$totp = $_POST['totp'];
+
+	if(!empty($_POST['pin']))
+		$pin = $_POST['pin'];
+
+	$result = processAction($_POST['action'], $user, $guest, $totp, $pin);
 
 	die(json_encode($result));
 }
@@ -56,9 +65,16 @@ $db->queryall('SELECT * FROM buttons WHERE type=\'entrance\' ORDER BY sort_index
 $elevators = array();
 $db->queryall('SELECT * FROM buttons WHERE type=\'elevator\' ORDER BY sort_index', $elevators);
 
+$nuki = array();
+// todo: disable for guests
+$db->queryall('SELECT * FROM nuki WHERE user_id=#', $nuki,'', $user['id']);
+
 $smarty->assign('gates', $gates);
 $smarty->assign('entrances', $entrances);
 $smarty->assign('elevators', $elevators);
+
+if(!empty($nuki))
+	$smarty->assign('nuki', $nuki);
 
 $smarty->assign('admin_limited_view', !array_key_exists('admin', $_GET));
 

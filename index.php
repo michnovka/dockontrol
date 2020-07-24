@@ -6,9 +6,11 @@ require_once dirname(__FILE__).'/libs/process_action.php';
 //error_reporting(E_ALL);
 //ini_set('display_errors','1');
 
-if(!empty($_POST['action'])){
+$user = null;
+$guest = null;
 
-	$user = null;
+
+if(!empty($_POST['action'])){
 
 	if(empty($_GET['guest'])) {
 		if(!_require_login(false)){
@@ -37,7 +39,7 @@ if(!empty($_POST['action'])){
 
 	$result = array('status' => 'error');
 
-	if($_POST['action'] == 'check_pin') {
+	if(empty($guest) && $_POST['action'] == 'check_pin') {
 		$nuki = $db->queryfirst('SELECT * FROM nuki WHERE user_id=# AND id=# LIMIT 1', $user['id'], $_POST['nuki_id']);
 
 		if(empty($nuki)){
@@ -59,8 +61,6 @@ if(!empty($_POST['action'])){
 	die(json_encode($result));
 }
 
-$user = null;
-
 if(empty($_GET['guest'])) {
 	_require_login();
 	$user = _get_user_array();
@@ -74,7 +74,6 @@ if(empty($_GET['guest'])) {
 $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions($user['id'], !array_key_exists('admin', $_GET)));
 
-
 $gates = array();
 $db->queryall('SELECT * FROM buttons WHERE type=\'gate\' ORDER BY sort_index', $gates);
 
@@ -84,9 +83,11 @@ $db->queryall('SELECT * FROM buttons WHERE type=\'entrance\' ORDER BY sort_index
 $elevators = array();
 $db->queryall('SELECT * FROM buttons WHERE type=\'elevator\' ORDER BY sort_index', $elevators);
 
+
 $nuki = array();
-// todo: disable for guests
-$db->queryall('SELECT * FROM nuki WHERE user_id=#', $nuki,'', $user['id']);
+
+if(empty($guest))
+	$db->queryall('SELECT * FROM nuki WHERE user_id=#', $nuki,'', $user['id']);
 
 $smarty->assign('gates', $gates);
 $smarty->assign('entrances', $entrances);

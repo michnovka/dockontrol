@@ -24,7 +24,7 @@ function processAction($action, $user, $guest = null, $totp = null, $pin = null)
 		$guest_id = $guest['id'];
 	}
 
-	if(preg_match('/^nuki_(unlock|lock)_([0-9]+)$/i', $action, $m)){
+	if(empty($guest) && preg_match('/^nuki_(unlock|lock)_([0-9]+)$/i', $action, $m)){
 		// process nuki
 		$nuki = $db->queryfirst('SELECT * FROM nuki WHERE user_id=# AND id=# LIMIT 1', $user['id'], $m[2]);
 

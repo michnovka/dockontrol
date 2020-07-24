@@ -39,7 +39,7 @@ CREATE TABLE `action_queue` (
                                 KEY `action_queue_guests_id_fk` (`guest_id`),
                                 CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3465 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3486 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -111,24 +111,24 @@ CREATE TABLE `buttons` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `camera_log`
+-- Table structure for table `camera_logs`
 --
 
-DROP TABLE IF EXISTS `camera_log`;
+DROP TABLE IF EXISTS `camera_logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `camera_log` (
-                              `id` bigint(20) NOT NULL AUTO_INCREMENT,
-                              `time` datetime NOT NULL,
-                              `user_id` int(11) NOT NULL,
-                              `camera_name_id` varchar(63) NOT NULL,
-                              PRIMARY KEY (`id`),
-                              KEY `camera_log_cameras_name_id_fk` (`camera_name_id`),
-                              KEY `camera_log_users_id_fk` (`user_id`),
-                              KEY `camera_log_time_index` (`time`),
-                              CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                              CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11955 DEFAULT CHARSET=utf8mb4;
+CREATE TABLE `camera_logs` (
+                               `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                               `time` datetime NOT NULL,
+                               `user_id` int(11) NOT NULL,
+                               `camera_name_id` varchar(63) NOT NULL,
+                               PRIMARY KEY (`id`),
+                               KEY `camera_log_cameras_name_id_fk` (`camera_name_id`),
+                               KEY `camera_log_users_id_fk` (`user_id`),
+                               KEY `camera_log_time_index` (`time`),
+                               CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                               CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17155 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -211,7 +211,7 @@ CREATE TABLE `guests` (
                           UNIQUE KEY `guests_hash_uindex` (`hash`),
                           KEY `guests_users_id_fk` (`user_id`),
                           CONSTRAINT `guests_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -232,7 +232,7 @@ CREATE TABLE `login_logs` (
                               PRIMARY KEY (`id`),
                               KEY `login_logs_users_id_fk` (`user_id`),
                               CONSTRAINT `login_logs_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1173 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=1180 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -296,7 +296,7 @@ CREATE TABLE `nuki_logs` (
                              KEY `nuki_logs_status_index` (`status`),
                              KEY `nuki_logs_time_index` (`time`),
                              CONSTRAINT `nuki_logs_nuki_id_fk` FOREIGN KEY (`nuki_id`) REFERENCES `nuki` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -356,6 +356,7 @@ CREATE TABLE `webauthn_registrations` (
                                           `created_time` datetime NOT NULL,
                                           `data` longblob NOT NULL,
                                           `credentialId` varchar(255) NOT NULL,
+                                          `last_used_time` datetime NOT NULL,
                                           PRIMARY KEY (`id`),
                                           KEY `webauthn_registrations_users_id_fk` (`user_id`),
                                           CONSTRAINT `webauthn_registrations_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -371,4 +372,4 @@ CREATE TABLE `webauthn_registrations` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-07-24 16:54:57
+-- Dump completed on 2020-07-24 18:54:23

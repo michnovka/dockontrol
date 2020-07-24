@@ -4,6 +4,8 @@ require_once dirname(__FILE__).'/../libs/config.php';
 require_once(dirname(__FILE__).'/../libs/api_libs.php');
 require_once dirname(__FILE__).'/../openwebnet-php/src/OpenWebNet.php';
 
+if(php_sapi_name() !== 'cli' || isset($_SERVER['HTTP_USER_AGENT']))
+	exit;
 
 function OWNOpenDoor($door_id){
 	$own = new OpenWebNet('192.168.1.35', 20000, '12345', OpenWebNetDebuggingLevel::NONE);

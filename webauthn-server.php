@@ -107,7 +107,7 @@ try {
 
 		$data = $WebAuthn->processCreate($clientDataJSON, $attestationObject, $challenge);
 
-		$db->query('INSERT INTO webauthn_registrations SET user_id=#, created_time=now(), data=??, credentialId = ?', $user['id'], serialize($data), bin2hex($data->credentialId));
+		$db->query('INSERT INTO webauthn_registrations SET user_id=#, created_time=now(), last_used_time=now(), data=??, credentialId = ?', $user['id'], serialize($data), bin2hex($data->credentialId));
 
 		$return = new stdClass();
 		$return->success = true;
@@ -140,6 +140,8 @@ try {
 
 		// process the get request. throws WebAuthnException if it fails
 		$WebAuthn->processGet($clientDataJSON, $authenticatorData, $signature, $credentialPublicKey, $challenge);
+
+		$db->fetch('UPDATE webauthn_registrations SET last_used_time=NOW() WHERE user_id=# AND credentialId=? LIMIT 1', $user['id'], bin2hex($id));
 
 		$pin = $db->fetch('SELECT pin FROM nuki WHERE id=# AND user_id=# LIMIT 1', $nuki_id, $user['id']);
 

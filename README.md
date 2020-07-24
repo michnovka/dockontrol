@@ -64,6 +64,20 @@ To avoid unauthorized door opening if your phone is stolen, a PIN code can be co
 
 If your device supports fingerprints, then these can be used instead of the PIN code to protect unlocking without the owner's permission.
 
+## CRON
+
+In order to function, a CRON must be set to process queue. A sample CRON is below:
+
+```crontab
+* * * * * php /var/www/html/cron/action_queue.php gate
+* * * * * php /var/www/html/cron/action_queue.php entrances
+* * * * * php /var/www/html/cron/action_queue.php z7
+* * * * * php /var/www/html/cron/action_queue.php z8
+* * * * * php /var/www/html/cron/action_queue.php z9
+
+0 2 * * * php /var/www/html/cron/db_cleanup.php
+```
+
 ### Disclaimer
 
 I honestly believe the security is sound, but I encourage everybody to properly review the code before using it with their NUKI devices. I am not responsible for any bugs that might be present, the software is provided in good faith as is, with no guarantees.

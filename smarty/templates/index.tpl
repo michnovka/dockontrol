@@ -555,13 +555,19 @@
 
             var isInModal = $(this_object).hasClass('clickable_modal');
 
+            var timeOutTime = 0;
+
+            if('ontouchstart' in window){
+                timeOutTime = 250;
+            }
+
             timeOut = setTimeout(function(){
                 if(touchMoved !== true || isInModal) {
                     clicksWithoutAction = 0;
                     console.log('held: ' + this_id);
                     doAction(this_id, this_object, isInModal, reSetUpHooks);
                 }
-            }, 250);
+            }, timeOutTime);
 
         }).bind('mouseup mouseleave touchend', function() {
 

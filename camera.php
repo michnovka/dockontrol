@@ -73,7 +73,7 @@ $photo_data = null;
 foreach ($cameras as $camera_i => $camera) {
 	// disabled for now
 	if (false && $user['id'] != 1) {
-		$fetches_in_5min = $db->fetch('SELECT COUNT(*) FROM camera_log WHERE user_id=# AND camera_name_id=? AND time > DATE_SUB(NOW(), INTERVAL 5 MINUTE )', $user['id'], $camera['name_id']);
+		$fetches_in_5min = $db->fetch('SELECT COUNT(*) FROM camera_logs WHERE user_id=# AND camera_name_id=? AND time > DATE_SUB(NOW(), INTERVAL 5 MINUTE )', $user['id'], $camera['name_id']);
 
 		if ($fetches_in_5min > 150) {
 			header('Content-type: image/png');
@@ -98,7 +98,7 @@ foreach ($cameras as $camera_i => $camera) {
 
 		$db->query('UPDATE cameras SET data_jpg=??, last_fetched = NOW() WHERE name_id=?', $cameras[$camera_i]['photo_data'], $camera['name_id']);
 
-		$db->query('INSERT INTO camera_log SET user_id=#, camera_name_id=?, time=NOW()', $user['id'], $camera['name_id']);
+		$db->query('INSERT INTO camera_logs SET user_id=#, camera_name_id=?, time=NOW()', $user['id'], $camera['name_id']);
 	} else {
 		// show old photo
 		$cameras[$camera_i]['photo_data'] = $db->fetch('SELECT data_jpg FROM cameras WHERE name_id=? LIMIT 1', $camera['name_id']);

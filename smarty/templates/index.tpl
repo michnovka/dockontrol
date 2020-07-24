@@ -505,7 +505,8 @@
 
             var allow_1min_open = img_element.data('allow1min');
 
-            $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button').attr('id', new_button_id);
+            // set also originalId data because a JS timeout can be set to update it later to non-up-to-date value
+            $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button').attr('id', new_button_id).data('originalId', new_button_id);
 
             var button_open_1min_element = $(open_garage_gate_modal).find('button.open_garage_gate_1min_dummy_button');
 
@@ -517,7 +518,7 @@
             startPictureInterval();
 
             if(!!allow_1min_open){
-                button_open_1min_element.show().attr('id', new_button_id+'_1min');
+                button_open_1min_element.show().attr('id', new_button_id+'_1min').data('originalId', new_button_id+'_1min');
             }else{
                 button_open_1min_element.hide();
             }

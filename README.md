@@ -45,3 +45,33 @@ https://HOSTNAME/camera.php?username=XXXXXX&password=YYYYYYY&camera=ZZZZZZ
 Where `camera` is a key value of the `$cameras` array in [camera.php](./camera.php)
 
 Permissions are checked and API calls are logged (as well as unsuccessful ones). There is a simple IP-time based brute-force protection.
+
+## NUKI integration
+ 
+This feature enables you to lock / unlock any doors with NUKI using [dockontrol-nuki-api](https://github.com/michnovka/dockontrol-nuki-api) server on your LAN.
+
+Make sure that *dockontrol-nuki-api* is accessible over HTTPS from DOCKontrol CP. Configure it with NUKI Bridge parameters and add this connection in DOCKontrol settings page.
+
+### NUKI security
+
+Special care was put into securing NUKI locks, as they can serve as doors to your home. For that reason, every DOCKontrol NUKI lock is configured with 2 passwords. One password is stored securely inside the DOCKontrol DB, another password never leaves your browser. Both passwords are used to generate TOTP codes and DOCKontrol NUKI API server issues lock / unlock commands only if both match.
+
+This means that even if somebody hacks DOCKontrol CP, they have no way to unlock your home. Even if somebody intercepts traffic on DOCKontrol server (even though its HTTPS), they cannot issue any commands, as TOTP codes are one-way hashed numbers, so they reveal no information about original passwords. Every TOTP code expires in 30 seconds.
+
+Not even the developers / DOCKontrol server providers can issue commands to your NUKI, as one piece of the necessary codes is always saved only on your devices.
+
+To avoid unauthorized door opening if your phone is stolen, a PIN code can be configured that is required for every NUKI unlock / lock operation. 
+
+If your device supports fingerprints, then these can be used instead of the PIN code to protect unlocking without the owner's permission.
+
+### Disclaimer
+
+I honestly believe the security is sound, but I encourage everybody to properly review the code before using it with their NUKI devices. I am not responsible for any bugs that might be present, the software is provided in good faith as is, with no guarantees.
+
+## Credits
+
+Special thanks to the contributors of these repos:
+
+- https://github.com/lbuchs/WebAuthn
+- https://github.com/jiangts/JS-OTP
+- https://github.com/emn178/hi-base32

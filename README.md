@@ -75,3 +75,14 @@ Special thanks to the contributors of these repos:
 - https://github.com/lbuchs/WebAuthn
 - https://github.com/jiangts/JS-OTP
 - https://github.com/emn178/hi-base32
+
+### TODO
+
+Want to help? The following things are currently on my TODO and I will be grateful for any pull requests:
+
+- CSRF protection
+- Allow/disallow guests to control NUKI
+- Camera cache
+- Guest codes overview and management
+- show NUKI logs
+- Dark mode CSS

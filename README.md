@@ -56,7 +56,7 @@ Make sure that *dockontrol-nuki-api* is accessible over HTTPS from DOCKontrol CP
 
 Special care was put into securing NUKI locks, as they can serve as doors to your home. For that reason, every DOCKontrol NUKI lock is configured with 2 passwords. One password is stored securely inside the DOCKontrol DB, another password never leaves your browser. Both passwords are used to generate TOTP codes and DOCKontrol NUKI API server issues lock / unlock commands only if both match.
 
-This means that even if somebody hacks DOCKontrol CP, they have no way to unlock your home. Even if somebody intercepts traffic on DOCKontrol server (even though its HTTPS), they cannot issue any commands, as TOTP codes are one-way hashed numbers, so they reveal no information about original passwords. Every TOTP code expires in 30 seconds.
+This means that even if somebody hacks DOCKontrol CP, they have no way to unlock your home. Even if somebody intercepts traffic on DOCKontrol server (even though its HTTPS), they cannot issue any commands, as TOTP codes are one-way hashed numbers, so they reveal no information about original passwords. Every TOTP code expires in 30 seconds and the use of nonces ensures that replay of commands is not possible.
 
 Not even the developers / DOCKontrol server providers can issue commands to your NUKI, as one piece of the necessary codes is always saved only on your devices.
 

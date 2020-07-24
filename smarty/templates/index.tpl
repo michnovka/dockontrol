@@ -354,7 +354,7 @@
         }
     }
 
-    function doAction(what, element, isInModal, reSetUpHooks, pin, totp){
+    function doAction(what, element, isInModal, reSetUpHooks, pin, totp, nonce){
 
         if($(element).hasClass('nuki')){
 
@@ -395,10 +395,16 @@
                 sha256(nuki_password).then(function (digest) {
                     var secret = base32.encode(hexToString(digest.substr(0, 20)));
 
-                    var totp = new jsOTP.totp();
-                    var timeCode = totp.getOtp(secret);
+                    var nonce = Date.now();
 
-                    doAction(what, element, isInModal, reSetUpHooks, pin, timeCode);
+                    sha256(nonce).then(function (digest2) {
+                        var secret = base32.encode(hexToString(digest.substr(0, 20))) + base32.encode(hexToString(digest2.substr(0, 10)));
+
+                        var totp = new jsOTP.totp();
+                        var timeCode = totp.getOtp(secret);
+
+                        doAction(what, element, isInModal, reSetUpHooks, pin, timeCode, nonce);
+                    });
                 });
 
                 return;
@@ -415,7 +421,7 @@
         what = what.replace(/_options/g,'');
 
 
-        $.post(window.location.self, { action : what, totp: totp, pin: pin }, function(data){
+        $.post(window.location.self, { action : what, totp: totp, pin: pin, totp_nonce: nonce }, function(data){
             $(actionResultSelector).find('p').text(data.message);
 
             var doNotHideActionResult = false;
@@ -809,9 +815,9 @@
             <div class="uk-width-1-3"><button type="button" class="uk-button uk-button-primary uk-width-1-1" id="pin_submit">OK</button></div>
         </div>
         <div class="uk-margin">
-            <div class="uk-form-controls">
-                <input class="uk-checkbox" id="pin_use_fingerprint" name="pin_use_fingerprint" type="checkbox" value="1">
-                <label class="uk-form-label" for="pin_use_fingerprint">Use fingerprint from now on</label>
+            <div class="uk-form-controls no-select">
+                <input class="uk-checkbox no-select" id="pin_use_fingerprint" name="pin_use_fingerprint" type="checkbox" value="1">
+                <label class="uk-form-label no-select" for="pin_use_fingerprint">Use fingerprint from now on</label>
             </div>
         </div>
     </div>

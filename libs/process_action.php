@@ -7,11 +7,12 @@ require_once dirname(__FILE__).'/lib_totp.php';
  * @param array $user
  * @param array|null $guest
  * @param string|null $totp
+ * @param int|null $totp_nonce
  * @param int|null $pin
  * @return string[]
  * @throws EDatabase
  */
-function processAction($action, $user, $guest = null, $totp = null, $pin = null){
+function processAction($action, $user, $guest = null, $totp = null, $totp_nonce = null, $pin = null){
 
 	global $db;
 
@@ -56,7 +57,7 @@ function processAction($action, $user, $guest = null, $totp = null, $pin = null)
 					$message = 'Unauthorized to lock';
 				} else {
 					// perform action
-					$secret1 = GoogleAuthenticator::hex_to_base32(substr(hash('sha256', $nuki['password1']), 0, 20));
+					$secret1 = str_pad(GoogleAuthenticator::hex_to_base32(substr(hash('sha256', $nuki['password1']), 0, 20)), 16, 'A', STR_PAD_LEFT).str_pad(GoogleAuthenticator::hex_to_base32(substr(hash('sha256', $totp_nonce),0,10)), 8, 'A', STR_PAD_LEFT);
 
 					$totp1 = GoogleAuthenticator::get_totp($secret1);
 					$totp2 = $totp;
@@ -65,6 +66,7 @@ function processAction($action, $user, $guest = null, $totp = null, $pin = null)
 						'username' => $nuki['username'],
 						'totp1' => $totp1,
 						'totp2' => $totp2,
+						'nonce' => $totp_nonce,
 						'action' => $action,
 					);
 

@@ -29,13 +29,17 @@ if(!empty($_POST['action'])){
 	}
 
 	$totp = null;
+	$totp_nonce = null;
 	$pin = null;
+
+	if(!empty($_POST['pin']))
+		$pin = $_POST['pin'];
 
 	if(!empty($_POST['totp']))
 		$totp = $_POST['totp'];
 
-	if(!empty($_POST['pin']))
-		$pin = $_POST['pin'];
+	if(!empty($_POST['totp_nonce']))
+		$totp_nonce = $_POST['totp_nonce'];
 
 	$result = array('status' => 'error');
 
@@ -56,7 +60,7 @@ if(!empty($_POST['action'])){
 			$result['status'] = 'ok';
 		}
 	}else {
-		$result = processAction($_POST['action'], $user, $guest, $totp, $pin);
+		$result = processAction($_POST['action'], $user, $guest, $totp, $totp_nonce, $pin);
 	}
 	die(json_encode($result));
 }

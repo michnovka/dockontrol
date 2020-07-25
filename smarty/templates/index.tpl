@@ -735,7 +735,7 @@
 
         {section name=g loop=$gates}
             {if $permissions[$gates[g].permission]}
-                <div class="uk-width-1-2@l"><button id="open_{$gates[g].id}_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">{$gates[g].name}</div>{if $gates[g].camera1}<div class="camera"><img src="security-camera.svg" width="40" data-camera1="{$gates[g].camera1}" data-camera2="{$gates[g].camera2}"{if $gates[g].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
+                <div class="uk-width-1-2@l"><button id="open_{$gates[g].id}_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">{$gates[g].name}</div>{if $gates[g].camera1}<div class="camera"><img src="/resources/images/security-camera.svg" width="40" data-camera1="{$gates[g].camera1}" data-camera2="{$gates[g].camera2}"{if $gates[g].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
             {/if}
         {/section}
 
@@ -743,7 +743,7 @@
 
         {section name=e loop=$entrances}
             {if $permissions[$entrances[e].permission]}
-                <div class="uk-width-1-3@l"><button id="open_{$entrances[e].id}_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">{$entrances[e].name}</div>{if $entrances[e].camera1}<div class="camera"><img src="security-camera.svg" width="40" data-camera1="{$entrances[e].camera1}" data-camera2="{$entrances[e].camera2}"{if $entrances[e].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
+                <div class="uk-width-1-3@l"><button id="open_{$entrances[e].id}_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-default uk-width-1-1"><div class="single_open">{$entrances[e].name}</div>{if $entrances[e].camera1}<div class="camera"><img src="/resources/images/security-camera.svg" width="40" data-camera1="{$entrances[e].camera1}" data-camera2="{$entrances[e].camera2}"{if $entrances[e].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
             {/if}
         {/section}
 
@@ -758,9 +758,9 @@
             <div class="uk-width-1-1"><h4 class="uk-h4">NUKI</h4></div>
 
             {section name=n loop=$nuki}
-                <div class="uk-width-1-2@l"><button name="action" id="nuki_unlock_{$nuki[n].id}" type="button" class="uk-button uk-button-primary uk-button-large uk-button-default uk-width-1-1 clickable nuki" value="nuki_unlock_{$nuki[n].id}">Unlock {$nuki[n].name}</button></div>
+                <div class="uk-width-1-2@l"><button name="action" id="nuki_unlock_{$nuki[n].id}" type="button" class="uk-button uk-button-default uk-button-large uk-button-default uk-width-1-1 clickable nuki nuki-unlock" value="nuki_unlock_{$nuki[n].id}">Unlock {$nuki[n].name}</button></div>
                 {if $nuki[n].can_lock}
-                    <div class="uk-width-1-2@l"><button name="action" id="nuki_lock_{$nuki[n].id}" type="button" class="uk-button uk-button-danger uk-button-large uk-button-default uk-width-1-1 clickable nuki" value="nuki_lock_{$nuki[n].id}">Lock {$nuki[n].name}</button></div>
+                    <div class="uk-width-1-2@l"><button name="action" id="nuki_lock_{$nuki[n].id}" type="button" class="uk-button uk-button-default uk-button-large uk-button-default uk-width-1-1 clickable nuki nuki-lock" value="nuki_lock_{$nuki[n].id}">Lock {$nuki[n].name}</button></div>
                 {/if}
             {/section}
 

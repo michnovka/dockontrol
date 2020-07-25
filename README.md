@@ -12,7 +12,9 @@ Control panel to open gates, entrances and garage doors at DOCK residence in Pra
 
 ## Requirements
 
-PHP 7.3+, michnovka/openwebnet-php submodule to communicate with Bticino
+PHP 7.3+ (with CURL and BCMath extensions), [michnovka/openwebnet-php](https://github.com/michnovka/openwebnet-php) submodule to communicate with Bticino
+
+For NUKI and logging NTP running on server to get correct time
 
 ## Hardware
 

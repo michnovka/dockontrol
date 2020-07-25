@@ -279,6 +279,27 @@
 
         }
 
+        .uk-button.nuki.nuki-lock {
+            background-image: url('/resources/images/locked.svg');
+        }
+
+        .uk-button.nuki.nuki-unlock {
+            background-image: url('/resources/images/unlocked.svg');
+        }
+
+        .uk-button.nuki.nuki-lock.success,.uk-button.nuki.nuki-unlock.success,.uk-button.nuki.nuki-lock.spinner,.uk-button.nuki.nuki-unlock.spinner {
+            background-image: none;
+        }
+
+        .uk-button.nuki{
+            background-repeat: no-repeat;
+            background-size: 40px 40px;
+            background-position-x: 96%;
+            background-position-y: center;
+        }
+
+
+
     </style>
 
 

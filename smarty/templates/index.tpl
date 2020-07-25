@@ -768,6 +768,35 @@
 
     </div>
 
+    {if $guest}
+        <div>
+            <ul class="uk-flex-center" uk-tab>
+                <li class="uk-active"><a href="#legend-cs">Česky</a></li>
+                <li><a href="#legend-en">English</a></li>
+            </ul>
+
+
+            <ul class="uk-switcher">
+                <li>
+                    <h4 class="uk-heading-line uk-margin-small uk-margin-small-top uk-text-center"><span>Legenda</span></h4>
+                    <div class="uk-margin uk-text-left">
+                        <p>Byl Vám udělen časově omezený přístup hosta k rezidenčnímu areálu DOCK v Praze. Všechny úkony prostřednictvím této stránky jsou logovány a areál je pod kamerovým monitoringem.</p>
+                        <p><strong>Car ENTER / EXIT</strong> - Podržte tlačítko pro otevření vjezdové brány a garáže pro vjezd / výjezd na jeden stisk.</p>
+                        <p><strong>Gates and entrances</strong> - Podržte tlačítko pro otevírání vchodů do baráku a pěších branek</p>
+                    </div>
+                </li>
+                <li>
+                    <h4 class="uk-heading-line uk-margin-small uk-margin-small-top uk-text-center"><span>Legend</span></h4>
+                    <div class="uk-margin uk-text-left">
+                        <p>You were granted a time-limited guest pass to the DOCK residential zone in Prague. All actions are logged and all entrances are under camera surveillance.</p>
+                        <p><strong>Car ENTER / EXIT</strong> - Hold the button down for a while to Open both the big gate and garage door in correct timing, allowing vehicle entry / exit with one click.</p>
+                        <p><strong>Gates and entrances</strong> - Hold the button down for a while to open pedestrian entrances</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    {/if}
+
 </div>
 
 

@@ -3,7 +3,25 @@
 <script src="resources/jsTOTP.min.js" type="text/javascript"></script>
 
 {literal}
-    <script>
+    <script type="text/javascript">
+
+        function getDistanceFromLatLonInM(lat1,lon1,lat2,lon2) {
+            var R = 6371000; // Radius of the earth in km
+            var dLat = deg2rad(lat2-lat1);  // deg2rad below
+            var dLon = deg2rad(lon2-lon1);
+            var a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+            ;
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            var d = R * c; // Distance in km
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180)
+        }
 
         /**
          * creates a new FIDO2 registration
@@ -491,7 +509,7 @@
                     picture_element.attr('src', picture_element.attr('src') + '1');
                 }
             }
-        }, 500);
+        }, 300);
     }
 
 
@@ -518,7 +536,7 @@
 
             $(open_garage_gate_modal).find('h2#open_garage_gate_modal_title').text('Open ' + $(this).parent().find('div.single_open').text());
 
-            picture_element.attr('src', 'loading.jpg').attr('src', 'camera.php?camera='+camera1_id+(!!camera2_id ? '&camera2='+camera2_id : '')+'&now'+Date.now());
+            picture_element.attr('src', '/resources/images/loading.jpg').attr('src', 'camera.php?camera='+camera1_id+(!!camera2_id ? '&camera2='+camera2_id : '')+'&now'+Date.now());
             picture_element.parent().find('.paused_container').hide();
 
             startPictureInterval();
@@ -534,6 +552,9 @@
 
         });
     }
+
+    var geolocationWatchID = null;
+    var geolocationNothingHappenedTimer = null;
 
     function setUpHooks(element){
 
@@ -572,7 +593,45 @@
                 if(touchMoved !== true || isInModal) {
                     clicksWithoutAction = 0;
                     console.log('held: ' + this_id);
-                    doAction(this_id, this_object, isInModal, reSetUpHooks);
+                    if({if $user.geolocation_enabled}true{else}false{/if} && this_id === 'enter' && navigator.geolocation) {
+
+                        navigator.geolocation.clearWatch(geolocationWatchID);
+
+                        vibrateIfPossible();
+                        makeElementSpinning(this_object);
+
+                        geolocationNothingHappenedTimer = setTimeout(function () {
+                            navigator.geolocation.clearWatch(geolocationWatchID);
+                            doAction(this_id, this_object, isInModal, reSetUpHooks);
+                        }, 5000);
+
+                        geolocationWatchID = navigator.geolocation.watchPosition(function(position){
+
+                            clearTimeout(geolocationNothingHappenedTimer);
+
+                            const lat1=50.105240;
+                            const long1 = 14.465270;
+
+                            const lat  = position.coords.latitude;
+                            const long = position.coords.longitude;
+                            const dist = getDistanceFromLatLonInM(lat, long, lat1, long1);
+
+                            if(dist < 50){
+                                navigator.geolocation.clearWatch(geolocationWatchID);
+                                doAction(this_id, this_object, isInModal, reSetUpHooks);
+                            }
+                        },function(error){
+                            alert('You can turn off geo-location for CAR ENTER in settings');
+                            clearTimeout(geolocationNothingHappenedTimer);
+                            navigator.geolocation.clearWatch(geolocationWatchID);
+                            doAction(this_id, this_object, isInModal, reSetUpHooks);
+                        },{
+                            timeout:5000,
+                            enableHighAccuracy: true
+                        });
+                    } else {
+                        doAction(this_id, this_object, isInModal, reSetUpHooks);
+                    }
                 }
             }, timeOutTime);
 
@@ -727,7 +786,7 @@
     <div class="uk-grid-small uk-text-center uk-grid-row-small" uk-grid>
 
         {if $permissions.gate}
-            <div class="uk-width-1-2@l"><button name="action" id="enter" type="button" class="uk-button uk-button-large uk-button-primary uk-width-1-1 clickable" value="enter">CAR ENTER</button></div>
+            <div class="uk-width-1-2@l"><button name="action" id="enter" type="button" class="uk-button uk-button-large uk-button-primary uk-width-1-1 clickable{if $user.geolocation_enabled} geolocation-icon{/if}" value="enter">CAR ENTER</button></div>
             <div class="uk-width-1-2@l"><button name="action" id="exit" type="button" class="uk-button uk-button-large uk-button-danger uk-width-1-1 clickable" value="exit">CAR EXIT</button></div>
         {/if}
 
@@ -812,8 +871,8 @@
             <div class="uk-grid-small uk-text-center uk-grid-row-small" uk-grid>
                 {if $user.has_camera_access}
                     <div class="uk-width-1-1 picture_container">
-                        <img src="loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture" />
-                        <div class="paused_container"><img src="pause.svg" width="80" /></div>
+                        <img src="/resources/images/loading.jpg" class="open_garage_gate_modal_camera_picture" id="open_garage_gate_modal_camera_picture" />
+                        <div class="paused_container"><img src="/resources/images/pause.svg" width="80" /></div>
                     </div>
                 {/if}
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_dummy_button" type="button" class="open_garage_gate_dummy_button uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">SINGLE OPEN</button></div>

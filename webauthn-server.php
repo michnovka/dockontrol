@@ -22,7 +22,7 @@ try {
 
 	$requireResidentKey = false;
 
-	$rpId = 'cp.libenskedoky.cz';
+	$rpId = $_SERVER['HTTP_HOST'];
 
 	$formats = array();
 

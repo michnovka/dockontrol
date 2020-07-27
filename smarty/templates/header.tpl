@@ -287,11 +287,15 @@
             background-image: url('/resources/images/unlocked.svg');
         }
 
+        .uk-button.geolocation-icon {
+            background-image: url('/resources/images/geolocation-white.svg');
+        }
+
         .uk-button.nuki.nuki-lock.success,.uk-button.nuki.nuki-unlock.success,.uk-button.nuki.nuki-lock.spinner,.uk-button.nuki.nuki-unlock.spinner {
             background-image: none;
         }
 
-        .uk-button.nuki{
+        .uk-button.nuki,.uk-button.geolocation-icon{
             background-repeat: no-repeat;
             background-size: 40px 40px;
             background-position-x: 96%;

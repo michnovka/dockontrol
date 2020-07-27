@@ -51,6 +51,10 @@ if(!empty($_POST['action'])) {
 			}
 
 			break;
+		case 'save_other_settings':
+			$db->query('UPDATE users SET geolocation_enabled = # WHERE id= #', $_POST['geolocation_enabled'] ? 1 : 0, $user['id']);
+			$smarty->assign('success', 'Settings saved');
+			break;
 	}
 
 }

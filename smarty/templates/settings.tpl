@@ -50,6 +50,19 @@
         </div>
     </form>
 
+    <form action="settings.php" method="post">
+        <div class="uk-grid-small uk-text-center uk-grid-row-small uk-margin-top" uk-grid>
+            <div class="uk-width-1-1"><h4 class="uk-h4">Other settings</h4></div>
+
+            <div class="uk-width-1-3@l">
+                <input type="checkbox" class="uk-checkbox uk-margin-right" value="1" name="geolocation_enabled" id="geolocation_enabled" {if $user.geolocation_enabled} checked{/if}/>
+                <label for="geolocation_enabled">Use Geo-location for car-enter</label>
+            </div>
+            <div class="uk-width-1-1"><button name="action" type="submit" class="uk-button uk-button-primary uk-width-1-1" value="save_other_settings">Save</button></div>
+
+        </div>
+    </form>
+
 </div>
 
 <div class="uk-container uk-container-medium uk-container-center uk-text-center uk-padding-large">

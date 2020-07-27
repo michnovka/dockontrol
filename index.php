@@ -9,7 +9,6 @@ require_once dirname(__FILE__).'/libs/process_action.php';
 $user = null;
 $guest = null;
 
-
 if(!empty($_POST['action'])){
 
 	if(empty($_GET['guest'])) {

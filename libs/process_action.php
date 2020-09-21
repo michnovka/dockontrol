@@ -16,7 +16,7 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 
 	global $db;
 
-	$status = '';
+	$status = 'error';
 	$message = '';
 
 	$guest_id = null;
@@ -56,6 +56,7 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 					$status = 'error';
 					$message = 'Unauthorized to lock';
 				} else {
+
 					// perform action
 					$secret1 = str_pad(GoogleAuthenticator::hex_to_base32(substr(hash('sha256', $nuki['password1']), 0, 20)), 16, 'A', STR_PAD_LEFT).str_pad(GoogleAuthenticator::hex_to_base32(substr(hash('sha256', $totp_nonce),0,10)), 8, 'A', STR_PAD_LEFT);
 

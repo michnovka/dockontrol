@@ -3,8 +3,7 @@
 require_once dirname(__FILE__).'/libs/config.php';
 require_once dirname(__FILE__).'/libs/process_action.php';
 
-//error_reporting(E_ALL);
-//ini_set('display_errors','1');
+/** @var Database4 $db */
 
 $user = null;
 $guest = null;

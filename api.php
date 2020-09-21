@@ -7,6 +7,8 @@ require_once(dirname(__FILE__).'/libs/api_libs.php');
 require_once(dirname(__FILE__).'/libs/process_action.php');
 require_once(dirname(__FILE__).'/config/API_SECRET.php');
 
+/** @var Database4 $db */
+
 $authentication_error = "Authentication error";
 $api_action = 'local_relay';
 $user = null;
@@ -46,6 +48,49 @@ switch ($api_action){
 		$reply['output'] = $output;
 
 		break;
+
+	case 'app_login':
+
+		try {
+			// at this point user is authorized, so enumerate actions that can be performed
+			$reply['status'] = 'ok';
+			$reply['allowed_actions'] = array();
+			$reply['config'] = array(
+				// timeout in seconds
+				'timeout' => 10
+			);
+
+			$permissions = _get_permissions($user['id']);
+
+			$buttons = array();
+			$db->queryall('SELECT * FROM buttons ORDER BY `type`="gate" DESC, `type`="entrance" DESC, `type`="elevator" DESC, sort_index', $buttons);
+
+			foreach ($buttons as $button){
+				if($permissions[$button['permission']]){
+
+					$action_prefix = 'open_';
+
+					if($button['type'] == 'elevator')
+						$action_prefix = 'unlock_';
+
+					$reply['allowed_actions'][] = array(
+						'id' => $button['id'],
+						'action' => $action_prefix.$button['id'],
+						'type' => $button['type'],
+						'name' => $button['name'],
+						'has_camera' => !empty($button['camera1']),
+						'allow_widget' => true
+					);
+				}
+			}
+
+		} catch (EDatabase $e) {
+			$reply['status'] = 'error';
+			$reply['message'] = 'Database error';
+		}
+
+		break;
+
 	default:
 		$reply = processAction($api_action, $user);
 		break;

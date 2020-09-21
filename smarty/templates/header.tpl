@@ -302,8 +302,16 @@
             background-position-y: center;
         }
 
+        {if $__samsung_watch}
+        body {
+            padding: 30px;
+        }
 
-
+        .uk-button-large{
+            font-size: 1.4rem;
+            line-height: 80px;
+        }
+        {/if}
     </style>
 
 

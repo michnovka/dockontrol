@@ -500,7 +500,7 @@ function startPictureInterval(){
                 picture_element.attr('src', picture_element.attr('src') + '1');
             }
         }
-    }, 300);
+    }, 1000);
 }
 
 
@@ -595,7 +595,7 @@ function setUpHooks(element){
                         alert('You can turn off geo-location for CAR ENTER in settings');
                         navigator.geolocation.clearWatch(geolocationWatchID);
                         doAction(this_id, this_object, isInModal, reSetUpHooks);
-                    }, 6000);
+                    }, 11000);
 
                     geolocationWatchID = navigator.geolocation.watchPosition(function(position){
 
@@ -618,7 +618,7 @@ function setUpHooks(element){
                         navigator.geolocation.clearWatch(geolocationWatchID);
                         doAction(this_id, this_object, isInModal, reSetUpHooks);
                     },{
-                        timeout:5000,
+                        timeout:10000,
                         enableHighAccuracy: true
                     });
                 } else {
@@ -716,10 +716,17 @@ $(document).ready(function(){
 
             pausedContainerElement.hide();
 
+            handleVisibilityChange();
             startPictureInterval();
         }
     });
 
+    if(_GEOLOCATION_ENABLED && navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(function(){}, function () {}, {
+            timeout:5000,
+            enableHighAccuracy: true
+        });
+    }
 });
 
 window.history.pushState({ page: 1 }, "", "");

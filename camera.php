@@ -3,7 +3,10 @@
 
 require_once dirname(__FILE__).'/libs/config.php';
 require_once dirname(__FILE__).'/libs/api_libs.php';
+require_once dirname(__FILE__).'/libs/fetch_camera_picture.php';
 
+//error_reporting(E_ALL);
+//ini_set('display_errors','1');
 
 $user = null;
 
@@ -83,21 +86,11 @@ foreach ($cameras as $camera_i => $camera) {
 	}
 
 
-	if ((time() - strtotime($camera['last_fetched'])) >= 1) {
+	if ( (time() - strtotime($camera['last_fetched'])) >= 1) {
 		// fetch new photo
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $camera['stream_url']);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
-		curl_setopt($ch, CURLOPT_USERPWD, $camera['stream_login']);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-		$cameras[$camera_i]['photo_data'] = curl_exec($ch);
+		$cameras[$camera_i]['photo_data'] = fetchCameraPicture($camera['stream_url'], $camera['stream_login']);
 
 		$db->query('UPDATE cameras SET data_jpg=??, last_fetched = NOW() WHERE name_id=?', $cameras[$camera_i]['photo_data'], $camera['name_id']);
-
 		$db->query('INSERT INTO camera_logs SET user_id=#, camera_name_id=?, time=NOW()', $user['id'], $camera['name_id']);
 	} else {
 		// show old photo

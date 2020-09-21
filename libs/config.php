@@ -17,6 +17,12 @@ $smarty->setCompileDir(dirname(__FILE__).'/../smarty/templates_c');
 $smarty->setCacheDir(dirname(__FILE__).'/../smarty/cache');
 $smarty->setConfigDir(dirname(__FILE__).'/../smarty/configs');
 
+if(
+	preg_match('/tizen/i', $_SERVER['HTTP_USER_AGENT']) &&
+	preg_match('/samsung/i', $_SERVER['HTTP_USER_AGENT'])
+)
+	$smarty->assign('__samsung_watch', true);
+
 $db = new Database4('localhost', 'dock', 'ObamaIsNotOsama!', 'dock', 'mysqli');
 
 /**

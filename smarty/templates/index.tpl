@@ -7,7 +7,6 @@
     var _GEOLOCATION_ENABLED = {if $user.geolocation_enabled}true{else}false{/if};
 </script>
 
-
 <div class="uk-container uk-container-small uk-container-center uk-text-center">
 
     <h2 class="uk-heading-line uk-margin-small uk-margin-small-top uk-text-center"><span>DOCKontrol</span></h2>

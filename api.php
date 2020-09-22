@@ -78,24 +78,55 @@ switch ($api_action){
 			$buttons = array();
 			$db->queryall('SELECT * FROM buttons ORDER BY `type`="gate" DESC, `type`="entrance" DESC, `type`="elevator" DESC, sort_index', $buttons);
 
-			foreach ($buttons as $button){
-				if($permissions[$button['permission']]){
+			if(!empty($buttons)) {
+				foreach ($buttons as $button) {
+					if ($permissions[$button['permission']]) {
 
-					$action_prefix = 'open_';
+						$action_prefix = 'open_';
 
-					if($button['type'] == 'elevator')
-						$action_prefix = 'unlock_';
+						if ($button['type'] == 'elevator')
+							$action_prefix = 'unlock_';
 
-					$reply['allowed_actions'][] = array(
-						'id' => $button['id'],
-						'action' => $action_prefix.$button['id'],
-						'type' => $button['type'],
-						'name' => $button['name'],
-						'has_camera' => !empty($button['camera1']),
-						'allow_widget' => true
-					);
+						$reply['allowed_actions'][] = array(
+							'id' => $button['id'],
+							'action' => $action_prefix . $button['id'],
+							'type' => $button['type'],
+							'name' => $button['name'],
+							'has_camera' => !empty($button['camera1']),
+							'allow_widget' => true
+						);
+					}
 				}
 			}
+
+			$nukis = null;
+			$db->queryall('SELECT * FROM nuki WHERE user_id=#', $nukis,'', $user['id']);
+
+			if(!empty($nukis)){
+				foreach ($nukis as $nuki){
+
+					$reply['allowed_actions'][] = array(
+						'id' => 'nuki_unlock_'.$nuki['id'],
+						'action' => 'nuki_unlock_'.$nuki['id'],
+						'type' => 'nuki',
+						'name' => 'Unlock '.$nuki['name'],
+						'has_camera' => false,
+						'allow_widget' => true
+					);
+
+					if($nuki['can_lock']){
+						$reply['allowed_actions'][] = array(
+							'id' => 'nuki_lock_'.$nuki['id'],
+							'action' => 'nuki_lock_'.$nuki['id'],
+							'type' => 'nuki',
+							'name' => 'Lock '.$nuki['name'],
+							'has_camera' => false,
+							'allow_widget' => true
+						);
+					}
+				}
+			}
+
 
 		} catch (EDatabase $e) {
 			$reply['status'] = 'error';

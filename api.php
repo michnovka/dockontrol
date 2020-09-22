@@ -109,21 +109,11 @@ switch ($api_action){
 						'id' => 'nuki_unlock_'.$nuki['id'],
 						'action' => 'nuki_unlock_'.$nuki['id'],
 						'type' => 'nuki',
-						'name' => 'Unlock '.$nuki['name'],
+						'name' => $nuki['name'],
+						'can_lock' => $nuki['can_lock'] ? true : false,
 						'has_camera' => false,
 						'allow_widget' => true
 					);
-
-					if($nuki['can_lock']){
-						$reply['allowed_actions'][] = array(
-							'id' => 'nuki_lock_'.$nuki['id'],
-							'action' => 'nuki_lock_'.$nuki['id'],
-							'type' => 'nuki',
-							'name' => 'Lock '.$nuki['name'],
-							'has_camera' => false,
-							'allow_widget' => true
-						);
-					}
 				}
 			}
 

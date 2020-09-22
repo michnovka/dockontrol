@@ -106,8 +106,8 @@ switch ($api_action){
 				foreach ($nukis as $nuki){
 
 					$reply['allowed_actions'][] = array(
-						'id' => 'nuki_unlock_'.$nuki['id'],
-						'action' => 'nuki_unlock_'.$nuki['id'],
+						'id' => 'nuki_'.$nuki['id'],
+						'action' => null,
 						'type' => 'nuki',
 						'name' => $nuki['name'],
 						'can_lock' => $nuki['can_lock'] ? true : false,

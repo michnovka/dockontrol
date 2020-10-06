@@ -86,6 +86,7 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 
 					$reply = json_decode(curl_exec($ch), true);
 
+
 					$status = $reply['status'];
 					$message = $reply['message'];
 
@@ -110,17 +111,17 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 
 					if (_check_permission('elevator_z9b2', $user) && $user['apartment'] == 'Z9.B2.501') {
 						_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 45, $guest_id);
-						_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 100, $guest_id);
+						_add_to_action_queue('unlock_elevator_z9b2', $user['id'], time() + 100, $guest_id, false);
 					}
 
 					if (_check_permission('elevator_z9b1', $user) && $user['apartment'] == 'Z9.B1.501') {
 						_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 45, $guest_id);
-						_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 100, $guest_id);
+						_add_to_action_queue('unlock_elevator_z9b1', $user['id'], time() + 100, $guest_id, false);
 					}
 
 					if (_check_permission('elevator_z8b1', $user) && $user['apartment'] == 'Z8.B1.601') {
 						_add_to_action_queue('unlock_elevator_z8b1', $user['id'], time() + 45, $guest_id);
-						_add_to_action_queue('unlock_elevator_z8b1', $user['id'], time() + 100, $guest_id);
+						_add_to_action_queue('unlock_elevator_z8b1', $user['id'], time() + 100, $guest_id, false);
 					}
 
 					$message = 'Gate and garage opened';
@@ -134,7 +135,7 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 				} else {
 					_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time(), $guest_id);
 					_add_to_action_queue('open_gate', $user['id'], time() + 23, $guest_id);
-					_add_to_action_queue('open_gate', $user['id'], time() + 28, $guest_id);
+					_add_to_action_queue('open_gate', $user['id'], time() + 28, $guest_id, false);
 					//sleep(1);
 					$message = 'Garage and gate opened';
 					$status = 'ok';
@@ -158,7 +159,7 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 					if ($gate_1min) {
 
 						for ($i = 5; $i < 60; $i += 5) {
-							_add_to_action_queue('open_gate', $user['id'], $now + $i, $guest_id);
+							_add_to_action_queue('open_gate', $user['id'], $now + $i, $guest_id, false);
 						}
 
 						$message = 'Garage opened for 1 min';
@@ -210,7 +211,7 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 					if ($garage_1min) {
 
 						for ($i = 4; $i < 60; $i += 4) {
-							_add_to_action_queue('open_garage_z' . $garage_number, $user['id'], $now + $i, $guest_id);
+							_add_to_action_queue('open_garage_z' . $garage_number, $user['id'], $now + $i, $guest_id, false);
 						}
 
 						$message = 'Garage opened for 1 min';
@@ -254,6 +255,10 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 	}
 
 	$result = array('status' => $status, 'message' => $message);
-	
+
+	// todo: remove when production
+	if(defined('_IS_API') && _IS_API)
+		sleep(2);
+
 	return $result;
 }

@@ -30,12 +30,15 @@ $db = new Database4('localhost', 'dock', 'ObamaIsNotOsama!', 'dock', 'mysqli');
  * @param int $user_id
  * @param int $time_start_unixtime
  * @param int $guest_id
+ * @param bool $count_into_stats
  * @throws EDatabase
  */
-function _add_to_action_queue($action, $user_id, $time_start_unixtime, $guest_id = null){
+function _add_to_action_queue($action, $user_id, $time_start_unixtime, $guest_id = null, $count_into_stats = true){
 	global $db;
 
-	$db->query('INSERT INTO action_queue SET time_created=NOW(), time_start=?, user_id=#, action=?'.($guest_id ? ',guest_id='.intval($guest_id) : ''), date('Y-m-d H:i:s', $time_start_unixtime), $user_id, $action);
+	// todo: remove
+	if($user_id != 50)
+		$db->query('INSERT INTO action_queue SET time_created=NOW(), time_start=?, user_id=#, count_into_stats=#, action=?'.($guest_id ? ',guest_id='.intval($guest_id) : ''), date('Y-m-d H:i:s', $time_start_unixtime), $user_id, $count_into_stats ? 1 : 0, $action);
 }
 
 /**

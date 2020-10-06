@@ -10,18 +10,20 @@
         <thead>
             <tr>
                 <th>Action</th>
-                <th>Counter</th>
+                {section name=usp loop=$usage_stats_periods}
+                    <th>{$usage_stats_periods[usp]}</th>
+                {/section}
             </tr>
         </thead>
         <tbody>
-            {section name=us loop=$usage_stats}
+            {foreach from=$usage_stats item=us key=a}
                 <tr>
-                    <td>{$usage_stats[us].action}</td>
-                    <td>{$usage_stats[us].c}</td>
+                    <td>{$a}</td>
+                    {foreach from=$usage_stats_periods item=usp}
+                        <td>{$us[$usp]|number_format:0}</td>
+                    {/foreach}
                 </tr>
-            {sectionelse}
-                <tr><td colspan="2">There are no actions queued</td> </tr>
-            {/section}
+            {/foreach}
         </tbody>
     </table>
 

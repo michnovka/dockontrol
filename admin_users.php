@@ -27,9 +27,13 @@ $db->queryall('SELECT * FROM groups ORDER BY name', $groups);
 $users = null;
 $db->queryall('SELECT GROUP_CONCAT(g.name) `groups_names`,u.* FROM users u INNER JOIN user_group ug on u.id = ug.user_id INNER JOIN groups g ON g.id = ug.group_id GROUP BY u.id ORDER BY u.id', $users);
 
+$last_command_times = null;
+$db->queryall('SELECT MAX(time_created) last_command_time, user_id FROM action_queue GROUP BY user_id', $last_command_times, '%user_id@last_command_time');
+
 foreach ($users as $k => $v){
 	$users[$k]['groups'] = explode(',',$v['user_groups']);
 	unset($users[$k]['user_groups']);
+	$users[$k]['last_command_time'] = $last_command_times[$v['id']][0];
 }
 
 $smarty->assign('users', $users);

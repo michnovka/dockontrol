@@ -14,7 +14,7 @@
                 <th>Time created</th>
                 <th>Enabled</th>
                 <th>Groups</th>
-                <th>Last login time</th>
+                <th>Last command time</th>
                 <th>Apartment</th>
                 <th>Default garage</th>
                 <th>E-mail</th>
@@ -30,7 +30,7 @@
                     <td>{$users[u].created}</td>
                     <td>{$users[u].enabled}</td>
                     <td>{$users[u].groups_names}</td>
-                    <td>{$users[u].last_login_time}</td>
+                    <td>{if !$users[u].last_command_time}NEVER{else}{$users[u].last_command_time}{/if}</td>
                     <td>{$users[u].apartment}</td>
                     <td>{$users[u].default_garage}</td>
                     <td>{$users[u].email}</td>

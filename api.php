@@ -79,6 +79,14 @@ switch ($api_action){
 			$db->queryall('SELECT * FROM buttons ORDER BY `type`="gate" DESC, `type`="entrance" DESC, `type`="elevator" DESC, sort_index', $buttons);
 
 			if(!empty($buttons)) {
+
+				$name_conflicts = array();
+
+				foreach($buttons as $button){
+					if($permissions[$button['permission']])
+						$name_conflicts[$button['name']]++;
+				}
+
 				foreach ($buttons as $button) {
 					if ($permissions[$button['permission']]) {
 
@@ -91,7 +99,7 @@ switch ($api_action){
 							'id' => $button['id'],
 							'action' => $action_prefix . $button['id'],
 							'type' => $button['type'],
-							'name' => $button['name'],
+							'name' => $button['name'].($name_conflicts[$button['name']] > 1 ? ' '.$button['name_specification'] : ''),
 							'has_camera' => !empty($button['camera1']),
 							'allow_widget' => true,
 							'icon' => 'PHN2ZyBpZD0iTGF5ZXJfMSIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgNDY0IDQ2NCIgaGVpZ2h0PSI1MTIiIHZpZXdCb3g9IjAgMCA0NjQgNDY0IiB3aWR0aD0iNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Im0zOTAgNDQ4djhjMCA0LjQyLTMuNTggOC04IDhoLTMwMGMtNC40MiAwLTgtMy41OC04LTh2LThjMC0xMy4yNSAxMC43NS0yNCAyNC0yNHYtNDE2YzAtNC40MiAzLjU4LTggOC04aDI1MmM0LjQyIDAgOCAzLjU4IDggOHY0MTZjMTMuMjUgMCAyNCAxMC43NSAyNCAyNHoiIGZpbGw9IiNmZmJkN2IiLz48cGF0aCBkPSJtMzY2IDQyNGMxMy4yNTUgMCAyNCAxMC43NDUgMjQgMjR2OGMwIDQuNDE4LTMuNTgyIDgtOCA4aC0zMDBjLTQuNDE4IDAtOC0zLjU4Mi04LTh2LThjMC0xMy4yNTUgMTAuNzQ1LTI0IDI0LTI0eiIgZmlsbD0iIzQyNDM0ZCIvPjxwYXRoIGQ9Im0zMjAgMzMxdjQyYzAgNC40MTgtMy41ODIgOC04IDhoLTE2MGMtNC40MTggMC04LTMuNTgyLTgtOHYtNDJjMC00LjQxOCAzLjU4Mi04IDgtOGgxNjBjNC40MTggMCA4IDMuNTgyIDggOHoiIGZpbGw9IiNmZmFhNjQiLz48cGF0aCBkPSJtMzIwIDUwdjE1MGMwIDQuNDE4LTMuNTgyIDgtOCA4aC0xNjBjLTQuNDE4IDAtOC0zLjU4Mi04LTh2LTE1MGMwLTQuNDE4IDMuNTgyLTggOC04aDE2MGM0LjQxOCAwIDggMy41ODIgOCA4eiIgZmlsbD0iI2UzZjdmYyIvPjxwYXRoIGQ9Im0xOTYgMjU5YzAgNC40Mi0zLjU4IDgtOCA4aC0yMS4wMWMtLjI2IDguMzItNy4xMSAxNS0xNS40OSAxNS04LjU1IDAtMTUuNS02Ljk1LTE1LjUtMTUuNSAwLTEwLjA2MiA5LjM3LTE2LjI3IDE1Ljc1LTE1LjQ5LjEyNS0uMDE1IDM2LjEyNC0uMDEgMzYuMjUtLjAxIDQuNDIgMCA4IDMuNTggOCA4eiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Im0zMjAgNTB2MTUwYzAgNC40MTgtMy41ODIgOC04IDhoLTE2MGMtNC40MTggMC04LTMuNTgyLTgtOHYtMTIuNzE5YzAtNC45MiA0LjQwNi04LjY5NiA5LjI2MS03Ljg5NSA4NS4wOTIgMTQuMDM3IDE0NS4yMDctNTIuMTA4IDE0NC4wNjYtMTI5LjI0Ni0uMDY2LTQuNDcyIDMuNTE5LTguMTM5IDcuOTkxLTguMTM5aDYuNjgyYzQuNDE4LS4wMDEgOCAzLjU4MSA4IDcuOTk5eiIgZmlsbD0iI2NhZjFmYyIvPjxwYXRoIGQ9Im0zNjYgOHYxNGMwIDQuNDE4LTMuNTgyIDgtOCA4aC0yMjJjLTQuNDE4IDAtOCAzLjU4Mi04IDh2Mzg2aC0zMHYtNDE2YzAtNC40MTggMy41ODItOCA4LThoMjUyYzQuNDE4IDAgOCAzLjU4MiA4IDh6IiBmaWxsPSIjZmZkM2E2Ii8+PHBhdGggZD0ibTM2Ni42NjUgNDM5Ljk4OWMtMjguMjQ5LS4wMy05NC4yMTcuMDExLTI0OS42NjUuMDExLTExLjE4IDAtMjAuNTggNy42NTMtMjMuMjQ0IDE4LjAwNC0uOTIgMy41NzItNC4yNDkgNS45OTYtNy45MzcgNS45OTZoLTMuODE5Yy00LjQxOCAwLTgtMy41ODItOC04di04YzAtMTMuMjU1IDEwLjc0NS0yNCAyNC0yNGgyNjhjMTIuMDg4IDAgMTAuODY1IDE2IC42NjUgMTUuOTg5eiIgZmlsbD0iIzU4NTk2NiIvPjwvc3ZnPg==',

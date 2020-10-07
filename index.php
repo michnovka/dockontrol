@@ -91,9 +91,28 @@ $nuki = array();
 if(empty($guest))
 	$db->queryall('SELECT * FROM nuki WHERE user_id=#', $nuki,'', $user['id']);
 
+$name_conflicts = array();
+
+foreach($gates as $row){
+	if(_check_permission($row['permission']))
+		$name_conflicts[$row['name']]++;
+}
+
+foreach($entrances as $row){
+	if(_check_permission($row['permission']))
+		$name_conflicts[$row['name']]++;
+}
+
+foreach($elevators as $row){
+	if(_check_permission($row['permission']))
+		$name_conflicts[$row['name']]++;
+}
+
 $smarty->assign('gates', $gates);
 $smarty->assign('entrances', $entrances);
 $smarty->assign('elevators', $elevators);
+
+$smarty->assign('name_conflicts', $name_conflicts);
 
 if(!empty($nuki))
 	$smarty->assign('nuki', $nuki);

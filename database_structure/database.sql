@@ -41,7 +41,7 @@ CREATE TABLE `action_queue` (
                                 KEY `action_queue_count_into_stats_index` (`count_into_stats`),
                                 CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11734 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12080 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +62,7 @@ CREATE TABLE `api_calls` (
                              KEY `api_calls_ip_index` (`ip`),
                              KEY `api_calls_time_index` (`time`),
                              CONSTRAINT `api_calls_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3554 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3627 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -96,6 +96,7 @@ CREATE TABLE `buttons` (
                            `id` varchar(63) NOT NULL,
                            `type` enum('gate','entrance','elevator') NOT NULL DEFAULT 'entrance',
                            `name` varchar(63) NOT NULL,
+                           `name_specification` varchar(63) DEFAULT NULL,
                            `permission` varchar(63) NOT NULL DEFAULT '',
                            `allow_1min_open` tinyint(4) NOT NULL DEFAULT 0,
                            `camera1` varchar(63) DEFAULT NULL,
@@ -130,7 +131,7 @@ CREATE TABLE `camera_logs` (
                                KEY `camera_log_time_index` (`time`),
                                CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=128039 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=129171 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,6 +176,10 @@ DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
                           `id` int(11) NOT NULL AUTO_INCREMENT,
                           `name` varchar(255) NOT NULL,
+                          `permission_entrance_z1b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z2b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z3b1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_z3b2` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_entrance_z7b1` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_entrance_z7b2` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_entrance_z8b1` tinyint(4) NOT NULL DEFAULT 0,
@@ -184,16 +189,22 @@ CREATE TABLE `groups` (
                           `permission_elevator_z8b1` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_elevator_z9b1` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_elevator_z9b2` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_garage_z1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_garage_z2` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_garage_z3` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_garage_z7` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_garage_z8` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_garage_z9` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_gate` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_gate_rw1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_gate_rw3` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_entrance_menclova` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_menclova_z1` tinyint(4) NOT NULL DEFAULT 0,
+                          `permission_entrance_menclova_z3` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_entrance_smrckova` tinyint(4) NOT NULL DEFAULT 0,
                           `permission_entrance_smrckova_river` tinyint(4) NOT NULL DEFAULT 0,
                           `admin` tinyint(4) NOT NULL DEFAULT 0,
                           PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -234,7 +245,7 @@ CREATE TABLE `login_logs` (
                               PRIMARY KEY (`id`),
                               KEY `login_logs_users_id_fk` (`user_id`),
                               CONSTRAINT `login_logs_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3548 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3679 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -255,7 +266,7 @@ CREATE TABLE `login_logs_failed` (
                                      KEY `login_logs_failed_ip_index` (`ip`),
                                      KEY `login_logs_failed_time_index` (`time`),
                                      KEY `login_logs_failed_username_index` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=206 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -298,7 +309,7 @@ CREATE TABLE `nuki_logs` (
                              KEY `nuki_logs_status_index` (`status`),
                              KEY `nuki_logs_time_index` (`time`),
                              CONSTRAINT `nuki_logs_nuki_id_fk` FOREIGN KEY (`nuki_id`) REFERENCES `nuki` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=210 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=211 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -343,7 +354,7 @@ CREATE TABLE `users` (
                          `geolocation_enabled` tinyint(4) NOT NULL DEFAULT 1,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `users_username_uindex` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -375,4 +386,4 @@ CREATE TABLE `webauthn_registrations` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-06  9:26:20
+-- Dump completed on 2020-10-07 16:50:41

@@ -68,25 +68,27 @@ if(!empty($_POST['action'])){
 
 			$default_garage = 'z9';
 
-			$group_id = 3; // z9.b2
+			$group_id = null; // z9.b2
 
 			if(!empty($apartment_parts)){
 				$default_garage = 'z'.$apartment_parts[1];
 				$group_id = $db->fetch('SELECT id FROM groups WHERE name = ?', 'Z'.$apartment_parts[1].'.B'.$apartment_parts[2]);
-
-				if(!$group_id)
-					$group_id = 3;
 			}
 
-			// create new user
-			$db->query('INSERT INTO users SET username=?, password=?,name=?,created=NOW(),enabled=#,apartment=?,default_garage=?,email=?,phone=?', $_POST['username'],PasswordTools::getHashedPassword($_POST['password']), $_POST['name'], 1,$_POST['apartment'], $default_garage, $_POST['email'], $_POST['phone']);
-			$user_id = $db->lastinsertid();
+			if(!$group_id){
+				$smarty->assign('error_message', 'Invalid apartment code, use ZX.BY.NNN');
+			}else {
 
-			// save groups
-			$db->query('INSERT INTO user_group SET user_id=#, group_id=#', $user_id, $group_id);
+				// create new user
+				$db->query('INSERT INTO users SET username=?, password=?,name=?,created=NOW(),enabled=#,apartment=?,default_garage=?,email=?,phone=?', $_POST['username'], PasswordTools::getHashedPassword($_POST['password']), $_POST['name'], 1, $_POST['apartment'], $default_garage, $_POST['email'], $_POST['phone']);
+				$user_id = $db->lastinsertid();
 
-			header('Location: login.php?username='.urlencode($_POST['username']));
-			exit;
+				// save groups
+				$db->query('INSERT INTO user_group SET user_id=#, group_id=#', $user_id, $group_id);
+
+				header('Location: login.php?username=' . urlencode($_POST['username']));
+				exit;
+			}
 
 		}else{
 			$smarty->assign('error_message', implode('. ', $error));

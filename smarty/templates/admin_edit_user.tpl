@@ -68,6 +68,9 @@
             <label class="uk-form-label" for="default_garage">Default garage</label>
             <div class="uk-form-controls">
                 <select class="uk-select" id="default_garage" name="default_garage">
+                    <option value="z1"{if $edit_user.default_garage == 'z1'} selected{/if}>Z1</option>
+                    <option value="z2"{if $edit_user.default_garage == 'z2'} selected{/if}>Z2</option>
+                    <option value="z3"{if $edit_user.default_garage == 'z3'} selected{/if}>Z3</option>
                     <option value="z7"{if $edit_user.default_garage == 'z7'} selected{/if}>Z7</option>
                     <option value="z8"{if $edit_user.default_garage == 'z8'} selected{/if}>Z8</option>
                     <option value="z9"{if $edit_user.default_garage == 'z9'} selected{/if}>Z9</option>

@@ -101,11 +101,15 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 		switch ($action) {
 
 			case 'enter':
-				// gate, 10sec sleep, garage
-				if (!_check_permission('gate', $user) || !_check_permission('garage_' . $user['default_garage'], $user)) {
+				$gate_rw = getRWFromGarage($user['default_garage']);
+
+				if(!$gate_rw){
+					$message = 'No default garage selected';
+				}elseif (!_check_permission('gate_rw'.$gate_rw, $user) || !_check_permission('garage_' . $user['default_garage'], $user)) {
 					$message = 'Not authorized';
 				} else {
-					_add_to_action_queue('open_gate', $user['id'], time(), $guest_id);
+
+					_add_to_action_queue('open_gate_rw'.$gate_rw, $user['id'], time(), $guest_id);
 					_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time() + 10, $guest_id);
 					//sleep(1);
 
@@ -130,39 +134,50 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 				break;
 
 			case 'exit':
-				if (!_check_permission('gate', $user) || !_check_permission('garage_' . $user['default_garage'], $user)) {
+				$gate_rw = getRWFromGarage($user['default_garage']);
+
+				if(!$gate_rw){
+					$message = 'No default garage selected';
+				}elseif (!_check_permission('gate_rw'.$gate_rw, $user) || !_check_permission('garage_' . $user['default_garage'], $user)) {
 					$message = 'Not authorized';
 				} else {
 					_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time(), $guest_id);
-					_add_to_action_queue('open_gate', $user['id'], time() + 23, $guest_id);
-					_add_to_action_queue('open_gate', $user['id'], time() + 28, $guest_id, false);
+					_add_to_action_queue('open_gate_rw'.$gate_rw, $user['id'], time() + 23, $guest_id);
+					_add_to_action_queue('open_gate_rw'.$gate_rw, $user['id'], time() + 28, $guest_id, false);
 					//sleep(1);
 					$message = 'Garage and gate opened';
 					$status = 'ok';
 				}
 				break;
 
-			case 'open_gate':
-			case 'open_gate_1min':
+			case 'open_gate_rw1':
+			case 'open_gate_rw1_1min':
+			case 'open_gate_rw3':
+			case 'open_gate_rw3_1min':
+				preg_match('/^open_gate_rw([0-9])(_1min)?$/i', $action, $gate);
+
+				$gate_rw = $gate[1];
+				$gate_1min = !!$gate[2];
+
 				// gate
-				if (!_check_permission('gate', $user)) {
+				if (!_check_permission('gate_rw'.$gate_rw, $user)) {
 					$message = 'Not authorized';
 				} else {
 					$now = time();
 
-					_add_to_action_queue('open_gate', $user['id'], $now, $guest_id);
-					//sleep(1);
-					$message = 'Gate opened';
+					$action_for_queue = 'open_gate_rw'.$gate_rw;
 
-					$gate_1min = $action == 'open_gate_1min';
+					_add_to_action_queue($action_for_queue, $user['id'], $now, $guest_id);
+
+					$message = 'Gate opened';
 
 					if ($gate_1min) {
 
 						for ($i = 5; $i < 60; $i += 5) {
-							_add_to_action_queue('open_gate', $user['id'], $now + $i, $guest_id, false);
+							_add_to_action_queue($action_for_queue, $user['id'], $now + $i, $guest_id, false);
 						}
 
-						$message = 'Garage opened for 1 min';
+						$message = 'Gate opened for 1 min';
 					}
 
 					$status = 'ok';
@@ -186,12 +201,18 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 				}
 				break;
 
-			case 'open_garage_z9_1min':
-			case 'open_garage_z8_1min':
-			case 'open_garage_z7_1min':
+			case 'open_garage_z1':
+			case 'open_garage_z1_1min':
+			case 'open_garage_z2':
+			case 'open_garage_z2_1min':
+			case 'open_garage_z3':
+			case 'open_garage_z3_1min':
 			case 'open_garage_z7':
+			case 'open_garage_z7_1min':
 			case 'open_garage_z8':
+			case 'open_garage_z8_1min':
 			case 'open_garage_z9':
+			case 'open_garage_z9_1min':
 
 				preg_match('/^open_garage_z([0-9])(_1min)?/', $action, $m);
 
@@ -221,6 +242,10 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 				}
 				break;
 
+			case 'open_entrance_z1b1':
+			case 'open_entrance_z2b1':
+			case 'open_entrance_z3b1':
+			case 'open_entrance_z3b2':
 			case 'open_entrance_z7b1':
 			case 'open_entrance_z7b2':
 			case 'open_entrance_z8b1':
@@ -230,6 +255,8 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 			case 'open_entrance_menclova':
 			case 'open_entrance_smrckova':
 			case 'open_entrance_smrckova_river':
+			case 'open_entrance_menclova_z1':
+			case 'open_entrance_menclova_z3':
 
 				preg_match('/^open_entrance_(.*)$/i', $action, $m);
 

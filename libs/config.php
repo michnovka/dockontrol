@@ -92,6 +92,10 @@ function _get_permissions($user_id = null, $ignore_admin = true)
 
 	$_SESSION['permissions'] = $db->queryfirst('SELECT
 		   MAX(g.admin) as admin,
+		   MAX(g.permission_entrance_z1b1) as entrance_z1b1,
+		   MAX(g.permission_entrance_z2b1) as entrance_z2b1,
+		   MAX(g.permission_entrance_z3b1) as entrance_z3b1,
+		   MAX(g.permission_entrance_z3b2) as entrance_z3b2,
 		   MAX(g.permission_entrance_z7b1) as entrance_z7b1,
 		   MAX(g.permission_entrance_z7b2) as entrance_z7b2,
 		   MAX(g.permission_entrance_z8b1) as entrance_z8b1,
@@ -101,11 +105,17 @@ function _get_permissions($user_id = null, $ignore_admin = true)
 		   MAX(g.permission_elevator_z8b1) as elevator_z8b1,
 		   MAX(g.permission_elevator_z9b1) as elevator_z9b1,
 		   MAX(g.permission_elevator_z9b2) as elevator_z9b2,
+		   MAX(g.permission_garage_z1) as garage_z1,
+		   MAX(g.permission_garage_z2) as garage_z2,
+		   MAX(g.permission_garage_z3) as garage_z3,
 		   MAX(g.permission_garage_z7) as garage_z7,
 		   MAX(g.permission_garage_z8) as garage_z8,
 		   MAX(g.permission_garage_z9) as garage_z9,
-		   MAX(g.permission_gate) as gate,
+		   MAX(g.permission_gate_rw1) as gate_rw1,
+		   MAX(g.permission_gate_rw3) as gate_rw3,
 		   MAX(g.permission_entrance_menclova) as entrance_menclova,
+		   MAX(g.permission_entrance_menclova_z1) as entrance_menclova_z1,
+		   MAX(g.permission_entrance_menclova_z3) as entrance_menclova_z3,
 		   MAX(g.permission_entrance_smrckova) as entrance_smrckova,
 		   MAX(g.permission_entrance_smrckova_river) as entrance_smrckova_river
 		FROM `groups` g INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=#'.($ignore_admin ? ' AND g.id != 1' : ''), $user_id);
@@ -161,6 +171,23 @@ function _restore_remember_me_cookie($log=true){
 
 	return false;
 
+}
+
+/**
+ * @param string $garage
+ * @return int|null
+ */
+function getRWFromGarage($garage){
+	$gate_rw = null;
+
+	if(in_array($garage, array('z7','z8','z9')))
+		$gate_rw = 3;
+	elseif(in_array($garage, array('z4','z5','z6')))
+		$gate_rw = 2;
+	elseif(in_array($garage, array('z1','z2','z3')))
+		$gate_rw = 1;
+
+	return $gate_rw;
 }
 
 /**

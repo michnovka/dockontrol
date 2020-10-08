@@ -8,8 +8,8 @@ require_once dirname(__FILE__).'/../libs/fetch_camera_picture.php';
 
 $minute_start = date('i');
 
-error_reporting(E_ALL);
-ini_set('display_errors','1');
+$now = date('Y-m-d H:i:s');
+$db->query('INSERT INTO config SET `key`=?, `value`=? ON DUPLICATE KEY UPDATE `value` = ?', 'last_cron_update_camera_cache_time', $now, $now);
 
 $camera_name = $argv[1];
 $camera = $db->queryfirst('SELECT stream_url, stream_login, name_id FROM cameras WHERE name_id=? LIMIT 1', $camera_name);

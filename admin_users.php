@@ -10,7 +10,7 @@ if(!_check_permission('admin')){
 
 if($_GET['change_signup_key']){
 	$new_key = PasswordTools::generateRandomHash(16, 16);
-	$db->query('UPDATE config SET `value`=? WHERE `key`=?', $new_key, 'signup_key');
+	$db->query('INSERT INTO config SET `key`=?, `value`=? ON DUPLICATE KEY UPDATE `value` = ?', 'signup_key', $new_key, $new_key);
 	header('Location:admin_users.php?signup_key_changed=1#signup_url');
 	exit;
 }

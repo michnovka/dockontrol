@@ -28,6 +28,14 @@ Some peripherals are needed in other buildings which is accomplished using a net
 
 All actions are logged in DB with the user id, time of action and originating IP address. All loads of camera shots are logged as well, there is a rate limiter preventing constant monitoring of cameras inside the object. The logs are kept indefinitely.
 
+## Configuration
+
+Database contains table `config` which should be pre-configured with the following variables:
+- openwebnet_ip
+- openwebnet_password
+- openwebnet_port
+
+
 ## API specification
 
 A simple API control is possible using the most basic form of authentication - plaintext username + password sent over HTTPS connection. Since passwords flying around in plaintext is, ehm, frowned upon, there are plans to change this for API keys and HMAC in the future. For now, be grateful this does not fly over HTTP to honor Bticino security standard.
@@ -78,6 +86,8 @@ In order to function, a CRON must be set to process queue. A sample CRON is belo
 * * * * * php /var/www/html/cron/action_queue.php z9
 
 0 2 * * * php /var/www/html/cron/db_cleanup.php
+
+*/5 * * * * php /var/www/html/cron/monitor.php
 ```
 
 ### Disclaimer

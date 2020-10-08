@@ -57,22 +57,38 @@ function DoAction($channel, $action, $duration = 0, $pause = 0){
  * @return string
  */
 function DoActionRemote($remote_host, $channel, $action, $duration = 0, $pause = 0){
-    $url = 'https://'.$remote_host.'/api.php?secret=PASSWORD736dbdyUDBN__d&channel='.intval($channel).'&action='.urlencode($action).'&duration='.intval($duration).'&pause='.intval($pause);
 
-    $output = file_get_contents($url, false, stream_context_create(
-    	array(
-    		'ssl' => array(
-    			'verify_peer' => false,
-    			'verify_peer_name' => false,
+	$params = array(
+		'duration' => intval($duration),
+		'pause' => intval($pause),
+		'channel' => intval($channel),
+	);
+
+	return CallDOCKontrolNode($remote_host, 'PASSWORD736dbdyUDBN__d', $action, $params);
+
+}
+
+function CallDOCKontrolNode($remote_host, $api_secret, $action, $params = array(), $timeout = 10){
+
+	$params['action'] = $action;
+	$params['secret'] = $api_secret;
+
+	$url = 'https://'.$remote_host.'/api.php?'.http_build_query($params);
+
+	$output = file_get_contents($url, false, stream_context_create(
+		array(
+			'ssl' => array(
+				'verify_peer' => false,
+				'verify_peer_name' => false,
 				'allow_self_signed' => true
 			),
 			'http' => array(
-				'timeout' => 10
+				'timeout' => $timeout
 			)
 		)
 	));
 
-    return $output;
+	return $output;
 }
 
 /**

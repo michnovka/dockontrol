@@ -31,7 +31,7 @@ if(!empty($_POST['save'])){
 			}
 
 			$db->query($sql, $g['id'], $p['name']);
-			
+
 		}
 	}
 

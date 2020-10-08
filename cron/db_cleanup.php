@@ -12,4 +12,7 @@ $db->query('DELETE FROM camera_logs WHERE time < DATE_SUB(NOW(), INTERVAL # DAY)
 $db->query('DELETE FROM nuki_logs WHERE time < DATE_SUB(NOW(), INTERVAL # DAY)', $CRON_FONFIG['nuki_logs_timelife_days']);
 $db->query('DELETE FROM webauthn_registrations WHERE last_used_time < DATE_SUB(NOW(), INTERVAL # DAY)', $CRON_FONFIG['webauthn_registrations_unused_timelife_days']);
 
+$now = date('Y-m-d H:i:s');
+$db->query('INSERT INTO config SET `key`=?, `value`=? ON DUPLICATE KEY UPDATE `value` = ?', 'last_cron_db_cleanup_time', $now, $now);
+
 echo date('Y-m-d H:i:s')." | All done\n";

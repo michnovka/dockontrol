@@ -93,6 +93,8 @@ function _get_permissions($user_id = null, $ignore_admin = true)
 	$permissions = null;
 	$db->queryall('SELECT DISTINCT gp.permission FROM group_permission gp INNER JOIN `groups` g ON g.id = gp.group_id INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=#'.($ignore_admin ? ' AND g.id NOT IN (SELECT group_id FROM group_permission WHERE permission="admin" OR permission="super_admin")' : ''), $permissions, 'permission', $user_id);
 
+	unset($_SESSION['permissions']);
+
 	foreach ($permissions as $permission){
 		$_SESSION['permissions'][$permission] = true;
 	}

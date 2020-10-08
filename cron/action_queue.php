@@ -93,6 +93,9 @@ while($minute_start == date('i')) {
 				case 'open_garage_z1':
 					DoActionRemote('10.8.0.11', 6, 'PULSE', 300000);
 					break;
+				case 'open_garage_z2':
+					DoActionRemote('10.8.0.12', 6, 'PULSE', 300000);
+					break;
 				case 'open_garage_z3':
 					DoActionRemote('10.8.0.13', 2, 'PULSE', 300000);
 					break;
@@ -119,6 +122,9 @@ while($minute_start == date('i')) {
 					break;
 				case 'open_entrance_z1b1':
 					DoActionRemote('10.8.0.11', 8, 'PULSE', 300000);
+					break;
+				case 'open_entrance_z2b1':
+					DoActionRemote('10.8.0.12', 8, 'PULSE', 300000);
 					break;
 				case 'open_entrance_z3b1':
 					DoActionRemote('10.8.0.13', 3, 'PULSE', 300000);

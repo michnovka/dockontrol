@@ -90,38 +90,17 @@ function _get_permissions($user_id = null, $ignore_admin = true)
 	if(!$user_id)
 		$user_id = $_SESSION['id'];
 
-	$_SESSION['permissions'] = $db->queryfirst('SELECT
-		   MAX(g.admin) as admin,
-		   MAX(g.permission_entrance_z1b1) as entrance_z1b1,
-		   MAX(g.permission_entrance_z2b1) as entrance_z2b1,
-		   MAX(g.permission_entrance_z3b1) as entrance_z3b1,
-		   MAX(g.permission_entrance_z3b2) as entrance_z3b2,
-		   MAX(g.permission_entrance_z7b1) as entrance_z7b1,
-		   MAX(g.permission_entrance_z7b2) as entrance_z7b2,
-		   MAX(g.permission_entrance_z8b1) as entrance_z8b1,
-		   MAX(g.permission_entrance_z8b2) as entrance_z8b2,
-		   MAX(g.permission_entrance_z9b1) as entrance_z9b1,
-		   MAX(g.permission_entrance_z9b2) as entrance_z9b2,
-		   MAX(g.permission_elevator_z8b1) as elevator_z8b1,
-		   MAX(g.permission_elevator_z9b1) as elevator_z9b1,
-		   MAX(g.permission_elevator_z9b2) as elevator_z9b2,
-		   MAX(g.permission_garage_z1) as garage_z1,
-		   MAX(g.permission_garage_z2) as garage_z2,
-		   MAX(g.permission_garage_z3) as garage_z3,
-		   MAX(g.permission_garage_z7) as garage_z7,
-		   MAX(g.permission_garage_z8) as garage_z8,
-		   MAX(g.permission_garage_z9) as garage_z9,
-		   MAX(g.permission_gate_rw1) as gate_rw1,
-		   MAX(g.permission_gate_rw3) as gate_rw3,
-		   MAX(g.permission_entrance_menclova) as entrance_menclova,
-		   MAX(g.permission_entrance_menclova_z1) as entrance_menclova_z1,
-		   MAX(g.permission_entrance_menclova_z3) as entrance_menclova_z3,
-		   MAX(g.permission_entrance_smrckova) as entrance_smrckova,
-		   MAX(g.permission_entrance_smrckova_river) as entrance_smrckova_river
-		FROM `groups` g INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=#'.($ignore_admin ? ' AND g.id != 1' : ''), $user_id);
+	$permissions = null;
+	$db->queryall('SELECT DISTINCT gp.permission FROM group_permission gp INNER JOIN `groups` g ON g.id = gp.group_id INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=#'.($ignore_admin ? ' AND g.id NOT IN (SELECT group_id FROM group_permission WHERE permission="admin" OR permission="super_admin")' : ''), $permissions, 'permission', $user_id);
 
-	if($ignore_admin)
-		$_SESSION['permissions']['admin'] = $db->fetch('SELECT 1 FROM `groups` g INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=# AND g.id=1', $user_id);
+	foreach ($permissions as $permission){
+		$_SESSION['permissions'][$permission] = true;
+	}
+
+	if($ignore_admin) {
+		$_SESSION['permissions']['admin'] = $db->fetch('SELECT 1 FROM group_permission gp INNER JOIN `groups` g ON gp.group_id = g.id INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=# AND gp.permission="admin" LIMIT 1', $user_id);
+		$_SESSION['permissions']['super_admin'] = $db->fetch('SELECT 1 FROM group_permission gp INNER JOIN `groups` g ON gp.group_id = g.id INNER JOIN user_group ug on g.id = ug.group_id WHERE ug.user_id=# AND gp.permission="super_admin" LIMIT 1', $user_id);
+	}
 
 	return $_SESSION['permissions'];
 }

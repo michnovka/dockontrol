@@ -2,9 +2,8 @@
 
 require_once dirname(__FILE__).'/libs/config.php';
 
-
 _require_login();
-if(!_check_permission('admin')){
+if(!_check_permission('super_admin')){
 	header('Location: /');
 	exit;
 }

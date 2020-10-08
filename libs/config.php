@@ -255,3 +255,5 @@ $db->queryall('SELECT * FROM config', $config_raw);
 foreach ($config_raw as $c){
 	$_CONFIG[$c['key']] = $c['value'];
 }
+
+$smarty->assign('_CONFIG', $_CONFIG);

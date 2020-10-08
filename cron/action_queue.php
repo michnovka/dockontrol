@@ -1,7 +1,7 @@
 <?php
 
 require_once dirname(__FILE__).'/../libs/config.php';
-require_once(dirname(__FILE__).'/../libs/api_libs.php');
+require_once dirname(__FILE__).'/../libs/api_libs.php';
 require_once dirname(__FILE__).'/../openwebnet-php/src/OpenWebNet.php';
 
 /** @var array $_CONFIG */
@@ -59,7 +59,7 @@ while($minute_start == date('i')) {
 					break;
 				case 'dockontrol_node_relay':
 					echo "DOCKontrol node ".$action['ip']." CH".$action['channel'];
-					DoActionRemote($action['ip'], $action['channel'], 'PULSE', 300000);
+					DoActionRemote($action['ip'], $action['api_secret'], $action['channel'], 'PULSE', 300000);
 					$db->query('UPDATE dockontrol_nodes SET last_command_executed_time=NOW() WHERE id=#', $action['dockontrol_node_id']);
 					break;
 				default:

@@ -29,6 +29,6 @@ $smarty->assign('usage_stats_periods', $usage_stats_periods);
 $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions());
 
-$smarty->display('stats.tpl');
+$smarty->display('admin_stats.tpl');
 
 ?>

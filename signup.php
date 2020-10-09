@@ -9,13 +9,14 @@ if(!empty($_SESSION['id'])){
 	header('Location: /');
 	exit;
 }
+$signup_code = $db->queryfirst('SELECT * FROM signup_codes WHERE hash=? AND expires > NOW() LIMIT 1', $_GET['key']);
 
-if($_GET['key'] != $_CONFIG['signup_key']){
+if(empty($signup_code)){
 	echo "Invalid signup key";
 	exit;
 }
 
-$edit_user = array();
+$edit_user = array('apartment' => $signup_code['apartment_mask']);
 
 if(!empty($_POST['action'])){
 	if($_POST['action'] == 'save'){
@@ -59,6 +60,8 @@ if(!empty($_POST['action'])){
 
 		if (!preg_match('/^Z([0-9])\.B([0-9])\.([0-9]{3})$/i',$_POST['apartment'], $apartment_parts)){
 			$error['apartment'] = "Use format ZX.BY.NNN for apartment";
+		}elseif(!preg_match('/^'.$signup_code['apartment_mask'].'/i', $_POST['apartment'])){
+			$error['apartment'] = "The apartment code is not allowed. Use format ZX.BY.NNN and allowed mask is ".$signup_code['apartment_mask'];
 		}
 
 		$edit_user['apartment'] = htmlspecialchars($_POST['apartment']);
@@ -80,11 +83,13 @@ if(!empty($_POST['action'])){
 			}else {
 
 				// create new user
-				$db->query('INSERT INTO users SET username=?, password=?,name=?,created=NOW(),enabled=#,apartment=?,default_garage=?,email=?,phone=?', $_POST['username'], PasswordTools::getHashedPassword($_POST['password']), $_POST['name'], 1, $_POST['apartment'], $default_garage, $_POST['email'], $_POST['phone']);
+				$db->query('INSERT INTO users SET username=?, password=?,name=?,created=NOW(),enabled=#,apartment=?,default_garage=?,email=?,phone=?,created_by=#', $_POST['username'], PasswordTools::getHashedPassword($_POST['password']), $_POST['name'], 1, $_POST['apartment'], $default_garage, $_POST['email'], $_POST['phone'], $signup_code['admin_id']);
 				$user_id = $db->lastinsertid();
 
 				// save groups
 				$db->query('INSERT INTO user_group SET user_id=#, group_id=#', $user_id, $group_id);
+
+				$db->query('UPDATE signup_codes SET signups_count = signups_count+1 WHERE hash = ?', $signup_code['hash']);
 
 				header('Location: login.php?username=' . urlencode($_POST['username']));
 				exit;

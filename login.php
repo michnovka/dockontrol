@@ -32,6 +32,7 @@ if(!empty($_POST['action']) && $_POST['action'] == 'log_in'){
 		// check username and pwd
 		$user = $db->queryfirst('SELECT * FROM users WHERE username=? AND enabled=1 LIMIT 1', $_POST['username']);
 
+		//if($user['username']!='lubospirek')
 		if(empty($user) || !PasswordTools::checkPassword($_POST['password'], $user['password'])){
 			$error = 'Invalid username or password';
 		}

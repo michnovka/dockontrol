@@ -59,6 +59,32 @@ function _check_permission($permission, $user = null)
 
 	return $_SESSION['permissions'][$permission] == 1;
 }
+
+/**
+ * @param int $admin_id
+ * @param int $user_id
+ * @return bool
+ * @throws EDatabase
+ */
+function _check_admin_permission_for_user($admin_id, $user_id){
+	global $db;
+
+	if(_check_permission('super_admin')) return true;
+
+	return $db->fetch('SELECT 1 FROM users u INNER JOIN user_group ug on u.id = ug.user_id INNER JOIN groups g ON g.id = ug.group_id WHERE u.id=# '.(_check_permission('super_admin') ? '' : ' AND apartment REGEXP (SELECT GROUP_CONCAT(CONCAT("^",ab.building) SEPARATOR "|") FROM admin_buildings ab INNER JOIN `groups` g ON g.id = ab.admin_group_id INNER JOIN group_permission gp on g.id = gp.group_id INNER JOIN user_group u on g.id = u.group_id WHERE gp.permission="admin" AND u.user_id='.intval($admin_id).')').' GROUP BY u.id ORDER BY u.id', $user_id) ? true : false;
+}
+
+/**
+ * @param int $admin_id
+ * @param string $building
+ * @return mixed|null
+ * @throws EDatabase
+ */
+function _check_admin_building_permission($admin_id, $building){
+	global $db;
+	return $db->fetch("SELECT ? REGEXP (SELECT GROUP_CONCAT(CONCAT('^',ab.building) SEPARATOR '|') FROM admin_buildings ab INNER JOIN `groups` g ON g.id = ab.admin_group_id INNER JOIN group_permission gp on g.id = gp.group_id INNER JOIN user_group u on g.id = u.group_id WHERE gp.permission='admin' AND u.user_id=#)", $building, $admin_id) ? true : false;
+}
+
 /**
  * @param int $nuki_id
  * @param null|array $user

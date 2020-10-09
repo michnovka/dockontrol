@@ -2,6 +2,24 @@
 
 
 <div class="uk-container uk-container-expand uk-container-center uk-text-center">
+    {if $signup_key_error}
+        <div class="uk-alert-danger uk-text-center uk-margin-medium" uk-alert>
+            <p>Error creating signup key: {$signup_key_error}</p>
+        </div>
+    {elseif $signup_key_created}
+        <div class="uk-alert-success uk-text-center uk-margin-medium" uk-alert>
+            <p>New link created successfully. It expires on {$signup_key_expires}</p>
+        </div>
+
+        Give this URL to users to sign up:
+        <div class="uk-margin">
+            <input class="uk-input uk-form-width-large" type="text" value="{$signup_url}" readonly>
+        </div>
+        <div class="uk-margin">
+            <img src="qrcode.php?content={$signup_url|urlencode}" srcset="qrcode.php?content={$signup_url|urlencode}&size=5,qrcode.php?content={$signup_url|urlencode}&size=10 2x" />
+        </div>
+
+    {/if}
 
     <h2 class="uk-heading-line uk-margin-small uk-margin-small-top uk-text-center"><span>Users CP</span></h2>
 
@@ -30,7 +48,7 @@
                     <td>{$users[u].created}</td>
                     <td>{$users[u].enabled}</td>
                     <td>{$users[u].groups_names}</td>
-                    <td>{if !$users[u].last_command_time}NEVER{else}<a href="admin_queue.php?user_id={$users[u].id}" title="View action history for {$users[u].username|escape}">{$users[u].last_command_time}</a>{/if}</td>
+                    <td>{if !$users[u].last_command_time}NEVER{else}{if $permissions.super_admin}<a href="admin_queue.php?user_id={$users[u].id}" title="View action history for {$users[u].username|escape}">{/if}{$users[u].last_command_time}{if $permissions.super_admin}</a>{/if}{/if}</td>
                     <td>{$users[u].apartment}</td>
                     <td>{$users[u].default_garage}</td>
                     <td>{$users[u].email}</td>
@@ -45,22 +63,16 @@
 
     <h4 class="uk-heading-line uk-margin-small uk-margin-large-top uk-text-center" id="signup_url"><span>Signup URL</span></h4>
 
-    {if $signup_key_changed}
-        <div class="uk-alert-success uk-text-center uk-margin-medium" uk-alert>
-            <p>Key changed successfully. Old one will no longer work.</p>
-        </div>
-    {/if}
 
-   Give this URL to users to sign up:
-    <div class="uk-margin">
-        <input class="uk-input uk-form-width-large" type="text" value="{$signup_url}" readonly>
-    </div>
-    <div class="uk-margin">
-        <img src="qrcode.php?content={$signup_url|urlencode}" srcset="qrcode.php?content={$signup_url|urlencode}&size=5,qrcode.php?content={$signup_url|urlencode}&size=10 2x" />
-    </div>
-    <div class="uk-margin">
-        <a class="uk-button uk-button-default uk-button-medium" href="admin_users.php?change_signup_key=1">Change key</a>
-    </div>
+    <form action="admin_users.php" method="post">
+        <div class="uk-margin">
+            <label for="apartment_mask">Apartment mask</label>
+            <input type="text" class="uk-input uk-width-medium" name="apartment_mask" id="apartment_mask" placeholder="ZX.BY or ZX.BY.NNN" />
+        </div>
+        <div class="uk-margin">
+            <button type="submit" class="uk-button uk-button-default uk-button-medium" name="create_new_signup_key" value="1">Create new key</button>
+        </div>
+    </form>
 
 </div>
 

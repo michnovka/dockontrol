@@ -100,12 +100,16 @@ foreach ($cameras as $camera_i => $camera) {
 }
 
 if(!empty($cameras[2]['photo_data'])){
-	$thumb = imagecreatetruecolor(1920, 2160);
+
+	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
+	list($width, $height, $type, $attr) =  getimagesizefromstring($cameras[1]['photo_data']);
+
+	$thumb = imagecreatetruecolor($width, $height*2);
 	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
 	$img2 = imagecreatefromstring($cameras[2]['photo_data']);
 
-	imagecopy($thumb, $img1, 0, 0, 0, 0, 1920, 1080); //have to play with these numbers for it to work for you, etc.
-	imagecopy($thumb, $img2, 0, 1080, 0, 0, 1920, 1080); //have to play with these numbers for it to work for you, etc.
+	imagecopy($thumb, $img1, 0, 0, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	imagecopy($thumb, $img2, 0, $height, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
 	header('Content-type: image/jpeg');
 
 	imagejpeg($thumb);

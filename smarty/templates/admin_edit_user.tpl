@@ -59,7 +59,7 @@
         <div class="uk-margin">
             <label class="uk-form-label" for="apartment">Apartment</label>
             <div class="uk-form-controls">
-                <input class="uk-input {if $error.phone}uk-form-danger{/if}" id="apartment" type="text" placeholder="ZX.BY.NNN" value="{$edit_user.apartment}" name="apartment">
+                <input class="uk-input {if $error.apartment}uk-form-danger{/if}" id="apartment" type="text" placeholder="ZX.BY.NNN" value="{$edit_user.apartment}" name="apartment">
             </div>
         </div>
 
@@ -99,7 +99,7 @@
             </div>
         </div>
 
-
+        {if $permissions.super_admin}
         <div class="uk-margin">
             <div class="uk-form-label">Groups</div>
             <div class="uk-form-controls uk-form-controls-text">
@@ -108,6 +108,7 @@
                 {/section}
             </div>
         </div>
+        {/if}
 
         <div class="uk-margin">
             <div class="uk-form-controls">

@@ -27,7 +27,7 @@ CREATE TABLE `action_queue` (
                                 `time_created` datetime NOT NULL,
                                 `time_start` datetime NOT NULL,
                                 `executed` tinyint(4) NOT NULL DEFAULT 0,
-                                `action` varchar(255) NOT NULL,
+                                `action` varchar(63) NOT NULL,
                                 `user_id` int(11) NOT NULL,
                                 `guest_id` int(11) DEFAULT NULL,
                                 `count_into_stats` tinyint(4) NOT NULL DEFAULT 1,
@@ -39,9 +39,29 @@ CREATE TABLE `action_queue` (
                                 KEY `action_queue_action_index` (`action`),
                                 KEY `action_queue_guests_id_fk` (`guest_id`),
                                 KEY `action_queue_count_into_stats_index` (`count_into_stats`),
+                                CONSTRAINT `action_queue_actions_name_fk` FOREIGN KEY (`action`) REFERENCES `actions` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12080 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12517 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `actions`
+--
+
+DROP TABLE IF EXISTS `actions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `actions` (
+                           `name` varchar(63) NOT NULL,
+                           `type` enum('openwebnet','dockontrol_node_relay') NOT NULL,
+                           `channel` int(10) unsigned NOT NULL,
+                           `dockontrol_node_id` int(10) unsigned DEFAULT NULL,
+                           `cron_group` varchar(63) NOT NULL DEFAULT '',
+                           PRIMARY KEY (`name`),
+                           KEY `actions_dockontrol_nodes_id_fk` (`dockontrol_node_id`),
+                           CONSTRAINT `actions_dockontrol_nodes_id_fk` FOREIGN KEY (`dockontrol_node_id`) REFERENCES `dockontrol_nodes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +82,7 @@ CREATE TABLE `api_calls` (
                              KEY `api_calls_ip_index` (`ip`),
                              KEY `api_calls_time_index` (`time`),
                              CONSTRAINT `api_calls_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3627 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3658 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,22 +114,27 @@ DROP TABLE IF EXISTS `buttons`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `buttons` (
                            `id` varchar(63) NOT NULL,
-                           `type` enum('gate','entrance','elevator') NOT NULL DEFAULT 'entrance',
+                           `type` enum('gate','entrance','elevator','custom') NOT NULL DEFAULT 'entrance',
+                           `action` varchar(63) DEFAULT NULL,
                            `name` varchar(63) NOT NULL,
                            `name_specification` varchar(63) DEFAULT NULL,
-                           `permission` varchar(63) NOT NULL DEFAULT '',
+                           `permission` varchar(63) DEFAULT NULL,
                            `allow_1min_open` tinyint(4) NOT NULL DEFAULT 0,
                            `camera1` varchar(63) DEFAULT NULL,
                            `camera2` varchar(63) DEFAULT NULL,
                            `sort_index` int(11) NOT NULL,
+                           `button_style` enum('basic','blue','red') NOT NULL DEFAULT 'basic',
                            PRIMARY KEY (`id`),
                            KEY `button_cameras_name_id_fk` (`camera1`),
                            KEY `button_cameras_name_id_fk_2` (`camera2`),
                            KEY `button_permission_index` (`permission`),
                            KEY `buttons_type_index` (`type`),
                            KEY `buttons_order_index` (`sort_index`),
+                           KEY `buttons_actions_name_fk` (`action`),
                            CONSTRAINT `button_cameras_name_id_fk` FOREIGN KEY (`camera1`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-                           CONSTRAINT `button_cameras_name_id_fk_2` FOREIGN KEY (`camera2`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE
+                           CONSTRAINT `button_cameras_name_id_fk_2` FOREIGN KEY (`camera2`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+                           CONSTRAINT `buttons_actions_name_fk` FOREIGN KEY (`action`) REFERENCES `actions` (`name`) ON DELETE SET NULL ON UPDATE CASCADE,
+                           CONSTRAINT `buttons_permissions_name_fk` FOREIGN KEY (`permission`) REFERENCES `permissions` (`name`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -131,7 +156,7 @@ CREATE TABLE `camera_logs` (
                                KEY `camera_log_time_index` (`time`),
                                CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=129171 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=135286 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,8 +172,10 @@ CREATE TABLE `cameras` (
                            `data_jpg` longblob NOT NULL,
                            `stream_url` varchar(255) NOT NULL,
                            `stream_login` varchar(255) NOT NULL,
-                           `permission_required` varchar(63) NOT NULL,
-                           PRIMARY KEY (`name_id`)
+                           `permission_required` varchar(63) DEFAULT NULL,
+                           PRIMARY KEY (`name_id`),
+                           KEY `cameras_permissions_name_fk` (`permission_required`),
+                           CONSTRAINT `cameras_permissions_name_fk` FOREIGN KEY (`permission_required`) REFERENCES `permissions` (`name`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -167,6 +194,66 @@ CREATE TABLE `config` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `dockontrol_nodes`
+--
+
+DROP TABLE IF EXISTS `dockontrol_nodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `dockontrol_nodes` (
+                                    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                                    `name` varchar(63) NOT NULL,
+                                    `ip` varchar(63) NOT NULL,
+                                    `last_command_executed_time` datetime DEFAULT NULL,
+                                    `status` enum('online','pingable','offline','invalid_api_secret') NOT NULL DEFAULT 'offline',
+                                    `ping` float(6,2) DEFAULT NULL,
+                                    `dockontrol_node_version` varchar(63) DEFAULT '',
+                                    `api_secret` varchar(255) NOT NULL,
+                                    `last_monitor_check_time` datetime DEFAULT NULL,
+                                    `comment` varchar(255) DEFAULT NULL,
+                                    `kernel_version` varchar(255) DEFAULT NULL,
+                                    `os_version` varchar(255) DEFAULT NULL,
+                                    `uptime` bigint(20) unsigned DEFAULT NULL,
+                                    `device` varchar(255) NOT NULL,
+                                    PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `group_admin_group`
+--
+
+DROP TABLE IF EXISTS `group_admin_group`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `group_admin_group` (
+                                     `admin_group_id` int(11) NOT NULL,
+                                     `group_id` int(11) NOT NULL,
+                                     UNIQUE KEY `group_admin_group_admin_group_id_group_id_uindex` (`admin_group_id`,`group_id`),
+                                     KEY `group_admin_group_groups_id_fk_2` (`group_id`),
+                                     CONSTRAINT `group_admin_group_groups_id_fk` FOREIGN KEY (`admin_group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                     CONSTRAINT `group_admin_group_groups_id_fk_2` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `group_permission`
+--
+
+DROP TABLE IF EXISTS `group_permission`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `group_permission` (
+                                    `group_id` int(11) NOT NULL,
+                                    `permission` varchar(63) DEFAULT NULL,
+                                    UNIQUE KEY `group_permission_group_id_permission_uindex` (`group_id`,`permission`),
+                                    KEY `group_permission_permissions_name_fk` (`permission`),
+                                    CONSTRAINT `group_permission_groups_id_fk` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+                                    CONSTRAINT `group_permission_permissions_name_fk` FOREIGN KEY (`permission`) REFERENCES `permissions` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `groups`
 --
 
@@ -176,35 +263,8 @@ DROP TABLE IF EXISTS `groups`;
 CREATE TABLE `groups` (
                           `id` int(11) NOT NULL AUTO_INCREMENT,
                           `name` varchar(255) NOT NULL,
-                          `permission_entrance_z1b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z2b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z3b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z3b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z7b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z7b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z8b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z8b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z9b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_z9b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_elevator_z8b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_elevator_z9b1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_elevator_z9b2` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_garage_z1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_garage_z2` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_garage_z3` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_garage_z7` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_garage_z8` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_garage_z9` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_gate_rw1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_gate_rw3` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_menclova` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_menclova_z1` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_menclova_z3` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_smrckova` tinyint(4) NOT NULL DEFAULT 0,
-                          `permission_entrance_smrckova_river` tinyint(4) NOT NULL DEFAULT 0,
-                          `admin` tinyint(4) NOT NULL DEFAULT 0,
                           PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -224,7 +284,7 @@ CREATE TABLE `guests` (
                           UNIQUE KEY `guests_hash_uindex` (`hash`),
                           KEY `guests_users_id_fk` (`user_id`),
                           CONSTRAINT `guests_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -245,7 +305,7 @@ CREATE TABLE `login_logs` (
                               PRIMARY KEY (`id`),
                               KEY `login_logs_users_id_fk` (`user_id`),
                               CONSTRAINT `login_logs_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3679 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3837 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -266,7 +326,7 @@ CREATE TABLE `login_logs_failed` (
                                      KEY `login_logs_failed_ip_index` (`ip`),
                                      KEY `login_logs_failed_time_index` (`time`),
                                      KEY `login_logs_failed_username_index` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=208 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -309,7 +369,21 @@ CREATE TABLE `nuki_logs` (
                              KEY `nuki_logs_status_index` (`status`),
                              KEY `nuki_logs_time_index` (`time`),
                              CONSTRAINT `nuki_logs_nuki_id_fk` FOREIGN KEY (`nuki_id`) REFERENCES `nuki` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=211 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `permissions`
+--
+
+DROP TABLE IF EXISTS `permissions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `permissions` (
+                               `name` varchar(63) NOT NULL,
+                               `name_pretty` varchar(63) NOT NULL DEFAULT '',
+                               PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -354,7 +428,7 @@ CREATE TABLE `users` (
                          `geolocation_enabled` tinyint(4) NOT NULL DEFAULT 1,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `users_username_uindex` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -386,4 +460,4 @@ CREATE TABLE `webauthn_registrations` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-07 16:50:41
+-- Dump completed on 2020-10-09  2:51:02

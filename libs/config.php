@@ -1,5 +1,7 @@
 <?php
 
+define('DOCKONTROL_VERSION', '2020.10.09.1');
+
 require_once dirname(__FILE__).'/lib_db4.php';
 require_once dirname(__FILE__).'/lib_password.php';
 require_once(dirname(__FILE__).'/../smarty/libs/Smarty.class.php');
@@ -283,3 +285,5 @@ foreach ($config_raw as $c){
 }
 
 $smarty->assign('_CONFIG', $_CONFIG);
+
+$smarty->assign('DOCKONTROL_VERSION', DOCKONTROL_VERSION);

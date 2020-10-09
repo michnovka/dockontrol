@@ -42,7 +42,7 @@ CREATE TABLE `action_queue` (
                                 CONSTRAINT `action_queue_actions_name_fk` FOREIGN KEY (`action`) REFERENCES `actions` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12517 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=12729 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,6 +65,21 @@ CREATE TABLE `actions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `admin_buildings`
+--
+
+DROP TABLE IF EXISTS `admin_buildings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `admin_buildings` (
+                                   `admin_group_id` int(11) NOT NULL,
+                                   `building` varchar(31) NOT NULL,
+                                   KEY `admin_buildings_groups_id_fk` (`admin_group_id`),
+                                   CONSTRAINT `admin_buildings_groups_id_fk` FOREIGN KEY (`admin_group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `api_calls`
 --
 
@@ -82,7 +97,7 @@ CREATE TABLE `api_calls` (
                              KEY `api_calls_ip_index` (`ip`),
                              KEY `api_calls_time_index` (`time`),
                              CONSTRAINT `api_calls_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3658 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3660 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -156,7 +171,7 @@ CREATE TABLE `camera_logs` (
                                KEY `camera_log_time_index` (`time`),
                                CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=135286 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=143088 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -168,10 +183,10 @@ DROP TABLE IF EXISTS `cameras`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cameras` (
                            `name_id` varchar(63) NOT NULL,
-                           `last_fetched` datetime NOT NULL,
-                           `data_jpg` longblob NOT NULL,
+                           `last_fetched` datetime DEFAULT NULL,
+                           `data_jpg` longblob DEFAULT NULL,
                            `stream_url` varchar(255) NOT NULL,
-                           `stream_login` varchar(255) NOT NULL,
+                           `stream_login` varchar(255) DEFAULT NULL,
                            `permission_required` varchar(63) DEFAULT NULL,
                            PRIMARY KEY (`name_id`),
                            KEY `cameras_permissions_name_fk` (`permission_required`),
@@ -220,23 +235,6 @@ CREATE TABLE `dockontrol_nodes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `group_admin_group`
---
-
-DROP TABLE IF EXISTS `group_admin_group`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `group_admin_group` (
-                                     `admin_group_id` int(11) NOT NULL,
-                                     `group_id` int(11) NOT NULL,
-                                     UNIQUE KEY `group_admin_group_admin_group_id_group_id_uindex` (`admin_group_id`,`group_id`),
-                                     KEY `group_admin_group_groups_id_fk_2` (`group_id`),
-                                     CONSTRAINT `group_admin_group_groups_id_fk` FOREIGN KEY (`admin_group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-                                     CONSTRAINT `group_admin_group_groups_id_fk_2` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `group_permission`
 --
 
@@ -264,7 +262,7 @@ CREATE TABLE `groups` (
                           `id` int(11) NOT NULL AUTO_INCREMENT,
                           `name` varchar(255) NOT NULL,
                           PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -284,7 +282,7 @@ CREATE TABLE `guests` (
                           UNIQUE KEY `guests_hash_uindex` (`hash`),
                           KEY `guests_users_id_fk` (`user_id`),
                           CONSTRAINT `guests_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -305,7 +303,7 @@ CREATE TABLE `login_logs` (
                               PRIMARY KEY (`id`),
                               KEY `login_logs_users_id_fk` (`user_id`),
                               CONSTRAINT `login_logs_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3837 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=3895 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -326,7 +324,7 @@ CREATE TABLE `login_logs_failed` (
                                      KEY `login_logs_failed_ip_index` (`ip`),
                                      KEY `login_logs_failed_time_index` (`time`),
                                      KEY `login_logs_failed_username_index` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=208 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=211 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -369,7 +367,7 @@ CREATE TABLE `nuki_logs` (
                              KEY `nuki_logs_status_index` (`status`),
                              KEY `nuki_logs_time_index` (`time`),
                              CONSTRAINT `nuki_logs_nuki_id_fk` FOREIGN KEY (`nuki_id`) REFERENCES `nuki` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=215 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -383,6 +381,26 @@ CREATE TABLE `permissions` (
                                `name` varchar(63) NOT NULL,
                                `name_pretty` varchar(63) NOT NULL DEFAULT '',
                                PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `signup_codes`
+--
+
+DROP TABLE IF EXISTS `signup_codes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `signup_codes` (
+                                `hash` varchar(32) NOT NULL,
+                                `admin_id` int(11) NOT NULL,
+                                `expires` datetime DEFAULT NULL,
+                                `apartment_mask` varchar(63) NOT NULL DEFAULT '',
+                                `created_time` datetime NOT NULL,
+                                `signups_count` int(10) unsigned NOT NULL DEFAULT 0,
+                                PRIMARY KEY (`hash`),
+                                KEY `signup_codes_users_id_fk` (`admin_id`),
+                                CONSTRAINT `signup_codes_users_id_fk` FOREIGN KEY (`admin_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -425,10 +443,11 @@ CREATE TABLE `users` (
                          `apartment` varchar(63) NOT NULL,
                          `has_camera_access` tinyint(4) NOT NULL DEFAULT 1,
                          `can_create_guests` tinyint(4) NOT NULL DEFAULT 1,
-                         `geolocation_enabled` tinyint(4) NOT NULL DEFAULT 1,
+                         `geolocation_enabled` tinyint(4) NOT NULL DEFAULT 0,
+                         `created_by` int(11) NOT NULL DEFAULT 1,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `users_username_uindex` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -460,4 +479,4 @@ CREATE TABLE `webauthn_registrations` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-09  2:51:02
+-- Dump completed on 2020-10-09 15:48:40

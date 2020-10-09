@@ -16,7 +16,7 @@
             {if $user.can_create_guests}<a href="create_guest.php">Guest pass</a> |{/if}
             <a href="logout.php">Log out</a><br/>
             <strong>ADMIN - </strong>
-            {if $permissions.super_admin}<a href="queue.php">Queue</a> |{/if}
+            {if $permissions.super_admin}<a href="admin_queue.php">Queue</a> |{/if}
             {if $permissions.admin}<a href="admin_users.php">Users</a> |{/if}
             {if $permissions.super_admin}<a href="admin_stats.php">Stats</a> |{/if}
             {if $permissions.super_admin}<a href="admin_groups.php">Groups</a> |{/if}

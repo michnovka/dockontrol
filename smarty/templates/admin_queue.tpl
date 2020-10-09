@@ -45,7 +45,7 @@
                 <tr>
                     <td>{$queue_executed[qe].time_start}</td>
                     <td>{$queue_executed[qe].action}</td>
-                    <td><a href="queue.php?user_id={$queue_executed[qe].user_id}" title="View queue for {$queue_executed[qe].name}">{$queue_executed[qe].name}</a></td>
+                    <td><a href="admin_queue.php?user_id={$queue_executed[qe].user_id}" title="View queue for {$queue_executed[qe].name}">{$queue_executed[qe].name}</a></td>
                     <td>{$queue_executed[qe].time_created}</td>
                 </tr>
 

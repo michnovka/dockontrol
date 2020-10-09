@@ -1,4 +1,4 @@
-{include file="header.tpl" title="Usage stats"}
+{include file="header.tpl" title="CRONs"}
 
 
 <div class="uk-container uk-container-small uk-container-center uk-text-center">

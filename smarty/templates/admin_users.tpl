@@ -30,7 +30,7 @@
                     <td>{$users[u].created}</td>
                     <td>{$users[u].enabled}</td>
                     <td>{$users[u].groups_names}</td>
-                    <td>{if !$users[u].last_command_time}NEVER{else}<a href="queue.php?user_id={$users[u].id}" title="View action history for {$users[u].username|escape}">{$users[u].last_command_time}</a>{/if}</td>
+                    <td>{if !$users[u].last_command_time}NEVER{else}<a href="admin_queue.php?user_id={$users[u].id}" title="View action history for {$users[u].username|escape}">{$users[u].last_command_time}</a>{/if}</td>
                     <td>{$users[u].apartment}</td>
                     <td>{$users[u].default_garage}</td>
                     <td>{$users[u].email}</td>

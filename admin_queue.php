@@ -33,6 +33,6 @@ $smarty->assign('queue_executed', $queue_executed);
 $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions());
 
-$smarty->display('queue.tpl');
+$smarty->display('admin_queue.tpl');
 
 ?>

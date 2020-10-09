@@ -90,14 +90,9 @@ switch ($api_action){
 				foreach ($buttons as $button) {
 					if ($permissions[$button['permission']]) {
 
-						$action_prefix = 'open_';
-
-						if ($button['type'] == 'elevator')
-							$action_prefix = 'unlock_';
-
 						$reply['allowed_actions'][] = array(
 							'id' => $button['id'],
-							'action' => $action_prefix . $button['id'],
+							'action' => $button['action'],
 							'type' => $button['type'],
 							'name' => $button['name'].($name_conflicts[$button['name']] > 1 ? ' '.$button['name_specification'] : ''),
 							'has_camera' => !empty($button['camera1']),

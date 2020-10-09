@@ -150,129 +150,40 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 				}
 				break;
 
-			case 'open_gate_rw1':
-			case 'open_gate_rw1_1min':
-			case 'open_gate_rw3':
-			case 'open_gate_rw3_1min':
-				preg_match('/^open_gate_rw([0-9])(_1min)?$/i', $action, $gate);
-
-				$gate_rw = $gate[1];
-				$gate_1min = !!$gate[2];
-
-				// gate
-				if (!_check_permission('gate_rw'.$gate_rw, $user)) {
-					$message = 'Not authorized';
-				} else {
-					$now = time();
-
-					$action_for_queue = 'open_gate_rw'.$gate_rw;
-
-					_add_to_action_queue($action_for_queue, $user['id'], $now, $guest_id);
-
-					$message = 'Gate opened';
-
-					if ($gate_1min) {
-
-						for ($i = 5; $i < 60; $i += 5) {
-							_add_to_action_queue($action_for_queue, $user['id'], $now + $i, $guest_id, false);
-						}
-
-						$message = 'Gate opened for 1 min';
-					}
-
-					$status = 'ok';
-				}
-				break;
-
-			case 'unlock_elevator_z8b1':
-			case 'unlock_elevator_z9b1':
-			case 'unlock_elevator_z9b2':
-
-				preg_match('/^unlock_elevator_(z[0-9]b[0-9])$/', $action, $m);
-
-				// elevator
-				if (!_check_permission('elevator_' . $m[1], $user)) {
-					$message = 'Not authorized';
-				} else {
-					_add_to_action_queue('unlock_elevator_' . $m[1], $user['id'], time(), $guest_id);
-					//sleep(1);
-					$message = 'Elevator unlocked';
-					$status = 'ok';
-				}
-				break;
-
-			case 'open_garage_z1':
-			case 'open_garage_z1_1min':
-			case 'open_garage_z2':
-			case 'open_garage_z2_1min':
-			case 'open_garage_z3':
-			case 'open_garage_z3_1min':
-			case 'open_garage_z7':
-			case 'open_garage_z7_1min':
-			case 'open_garage_z8':
-			case 'open_garage_z8_1min':
-			case 'open_garage_z9':
-			case 'open_garage_z9_1min':
-
-				preg_match('/^open_garage_z([0-9])(_1min)?/', $action, $m);
-
-				$garage_number = $m[1];
-				$garage_1min = !!$m[2];
-
-				// garage z9
-				if (!_check_permission('garage_z' . $garage_number, $user)) {
-					$message = 'Not authorized';
-				} else {
-
-					$now = time();
-
-					_add_to_action_queue('open_garage_z' . $garage_number, $user['id'], $now, $guest_id);
-					$message = 'Garage opened';
-
-					if ($garage_1min) {
-
-						for ($i = 4; $i < 60; $i += 4) {
-							_add_to_action_queue('open_garage_z' . $garage_number, $user['id'], $now + $i, $guest_id, false);
-						}
-
-						$message = 'Garage opened for 1 min';
-					}
-
-					$status = 'ok';
-				}
-				break;
-
-			case 'open_entrance_z1b1':
-			case 'open_entrance_z2b1':
-			case 'open_entrance_z3b1':
-			case 'open_entrance_z3b2':
-			case 'open_entrance_z7b1':
-			case 'open_entrance_z7b2':
-			case 'open_entrance_z8b1':
-			case 'open_entrance_z8b2':
-			case 'open_entrance_z9b1':
-			case 'open_entrance_z9b2':
-			case 'open_entrance_menclova':
-			case 'open_entrance_smrckova':
-			case 'open_entrance_smrckova_river':
-			case 'open_entrance_menclova_z1':
-			case 'open_entrance_menclova_z3':
-
-				preg_match('/^open_entrance_(.*)$/i', $action, $m);
-
-				$entrance_name = $m[1];
-
-				if (!_check_permission('entrance_' . $entrance_name, $user)) {
-					$message = 'Not authorized';
-				} else {
-					_add_to_action_queue($action, $user['id'], time(), $guest_id);
-					$message = 'Entrance opened';
-					$status = 'ok';
-				}
-				break;
 			default:
-				$status = 'error';
-				$message = 'Unknown action';
+				preg_match('/^(.*)(_1min)?$/iU', $action, $m);
+
+				$is_1min = !!$m[2];
+
+				$button = $db->queryfirst('SELECT * FROM buttons WHERE action=? LIMIT 1', $m[1]);
+
+				if(empty($button)) {
+					$status = 'error';
+					$message = 'Unknown action';
+				}else{
+					if (!_check_permission($button['permission'], $user)) {
+						$message = 'Not authorized';
+					}elseif($is_1min && !$button['allow_1min_open']){
+						$message = 'Not allowed to open for 1 min';
+					}else{
+						$now = time();
+
+						_add_to_action_queue($button['action'], $user['id'], $now, $guest_id);
+
+						$message = $button['name'].' opened';
+
+						if ($is_1min) {
+
+							for ($i = 5; $i < 60; $i += 5) {
+								_add_to_action_queue($button['action'], $user['id'], $now + $i, $guest_id, false);
+							}
+
+							$message = $button['name'].' opened for 1 min';
+						}
+
+						$status = 'ok';
+					}
+				}
 		}
 	}
 

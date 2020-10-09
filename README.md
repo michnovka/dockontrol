@@ -14,7 +14,7 @@ Control panel to open gates, entrances and garage doors at DOCK residence in Pra
 
 PHP 7.3+ (with CURL, GD and BCMath extensions), [michnovka/openwebnet-php](https://github.com/michnovka/openwebnet-php) submodule to communicate with Bticino
 
-For NUKI and logging NTP running on server to get correct time
+For NUKI and logging the main server should have NTP service to get correct time
 
 ## Hardware
 
@@ -52,7 +52,7 @@ The API call to fetch camera JPG looks like
 https://HOSTNAME/camera.php?username=XXXXXX&password=YYYYYYY&camera=ZZZZZZ
 ```
 
-Where `camera` is a key value of the `$cameras` array in [camera.php](./camera.php)
+Where `camera` is defined in DB in `cameras` table
 
 Permissions are checked and API calls are logged (as well as unsuccessful ones). There is a simple IP-time based brute-force protection.
 

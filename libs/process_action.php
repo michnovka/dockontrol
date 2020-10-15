@@ -189,13 +189,13 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 
 	if($guest && $status != 'error' && $guest['remaining_actions'] > 0){
 		// subtract one action
-		$db->query('UPDATE guests SET remaining_actions = # WHERE id=#', --$guest['remaining_actions'], $guest['id']);
+		$db->query('UPDATE guests SET remaining_actions = IF(remaining_actions <= 0, 0, remaining_actions - 1) WHERE id=#', $guest['id']);
 	}
 
 	$result = array('status' => $status, 'message' => $message);
 
 	// todo: remove when production
-	if(defined('_IS_API') && _IS_API)
+	if(defined('_IS_API') && _IS_API && $user['id'] != 1)
 		sleep(2);
 
 	return $result;

@@ -49,7 +49,7 @@ foreach($nodes as $node){
 		}
 	}
 
-	$db->query('UPDATE dockontrol_nodes SET status=?, ping='.($ping == null ? 'NULL' : floatval($ping)).', last_monitor_check_time=NOW() WHERE id=#', $status, $node['id']);
+	$db->query('UPDATE dockontrol_nodes SET status=?, ping='.($ping == null ? 'NULL' : floatval($ping)).','.($ping ? ' last_ping_time=NOW(), ' : '').' last_monitor_check_time=NOW() WHERE id=#', $status, $node['id']);
 
 	if($status == 'online'){
 		$db->query('UPDATE dockontrol_nodes SET dockontrol_node_version=?, os_version=?, kernel_version=?, uptime=#, device=?, last_monitor_check_time=NOW() WHERE id=#', $version, $os_version, $kernel_version, $uptime, $device, $node['id']);

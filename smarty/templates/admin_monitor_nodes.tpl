@@ -28,6 +28,7 @@
                 <th>Status</th>
                 <th>Last command</th>
                 <th>Ping</th>
+                <th>Last ping time</th>
                 <th>Version</th>
                 <th>OS Kernel</th>
                 <th>Device</th>
@@ -41,9 +42,10 @@
                     <td>{$nodes[n].id}</td>
                     <td>{$nodes[n].name}</td>
                     <td>{$nodes[n].ip}</td>
-                    <td>{$nodes[n].status}</td>
+                    <td><span class="uk-label{if $nodes[n].status != 'pingable'} uk-label-{if $nodes[n].status == 'online'}success{else}danger{/if}{/if}">{$nodes[n].status}</span></td>
                     <td>{$nodes[n].last_command_executed_time}</td>
                     <td>{$nodes[n].ping|number_format:0} ms</td>
+                    <td>{$nodes[n].last_ping_time}</td>
                     <td>{$nodes[n].dockontrol_node_version}</td>
                     <td>OS: {$nodes[n].os_version} | Kernel: {$nodes[n].kernel_version}</td>
                     <td>{$nodes[n].device}</td>

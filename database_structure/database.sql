@@ -1,8 +1,8 @@
--- MySQL dump 10.17  Distrib 10.3.22-MariaDB, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.17  Distrib 10.3.25-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: dock
 -- ------------------------------------------------------
--- Server version       10.3.22-MariaDB-1ubuntu1
+-- Server version       10.3.25-MariaDB-0ubuntu0.20.04.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -42,7 +42,7 @@ CREATE TABLE `action_queue` (
                                 CONSTRAINT `action_queue_actions_name_fk` FOREIGN KEY (`action`) REFERENCES `actions` (`name`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `action_queue_guests_id_fk` FOREIGN KEY (`guest_id`) REFERENCES `guests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                 CONSTRAINT `queue_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12729 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=64674 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -97,7 +97,7 @@ CREATE TABLE `api_calls` (
                              KEY `api_calls_ip_index` (`ip`),
                              KEY `api_calls_time_index` (`time`),
                              CONSTRAINT `api_calls_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3660 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=8857 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -117,7 +117,7 @@ CREATE TABLE `api_calls_failed` (
                                     KEY `api_calls_failed_ip_index` (`ip`),
                                     KEY `api_calls_failed_time_index` (`time`),
                                     KEY `api_calls_failed_username_index` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -129,14 +129,19 @@ DROP TABLE IF EXISTS `buttons`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `buttons` (
                            `id` varchar(63) NOT NULL,
-                           `type` enum('gate','entrance','elevator','custom') NOT NULL DEFAULT 'entrance',
+                           `type` enum('gate','entrance','elevator','multi','custom') NOT NULL DEFAULT 'entrance',
                            `action` varchar(63) DEFAULT NULL,
+                           `action_multi` varchar(255) DEFAULT NULL,
+                           `action_multi_description` varchar(255) DEFAULT NULL,
                            `name` varchar(63) NOT NULL,
                            `name_specification` varchar(63) DEFAULT NULL,
                            `permission` varchar(63) DEFAULT NULL,
+                           `user_id` int(11) DEFAULT NULL,
                            `allow_1min_open` tinyint(4) NOT NULL DEFAULT 0,
                            `camera1` varchar(63) DEFAULT NULL,
                            `camera2` varchar(63) DEFAULT NULL,
+                           `camera3` varchar(63) DEFAULT NULL,
+                           `camera4` varchar(63) DEFAULT NULL,
                            `sort_index` int(11) NOT NULL,
                            `button_style` enum('basic','blue','red') NOT NULL DEFAULT 'basic',
                            PRIMARY KEY (`id`),
@@ -146,10 +151,16 @@ CREATE TABLE `buttons` (
                            KEY `buttons_type_index` (`type`),
                            KEY `buttons_order_index` (`sort_index`),
                            KEY `buttons_actions_name_fk` (`action`),
+                           KEY `button_cameras_name_id_fk_3` (`camera3`),
+                           KEY `button_cameras_name_id_fk_4` (`camera4`),
+                           KEY `buttons_users_id_fk` (`user_id`),
                            CONSTRAINT `button_cameras_name_id_fk` FOREIGN KEY (`camera1`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE,
                            CONSTRAINT `button_cameras_name_id_fk_2` FOREIGN KEY (`camera2`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+                           CONSTRAINT `button_cameras_name_id_fk_3` FOREIGN KEY (`camera3`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+                           CONSTRAINT `button_cameras_name_id_fk_4` FOREIGN KEY (`camera4`) REFERENCES `cameras` (`name_id`) ON DELETE SET NULL ON UPDATE CASCADE,
                            CONSTRAINT `buttons_actions_name_fk` FOREIGN KEY (`action`) REFERENCES `actions` (`name`) ON DELETE SET NULL ON UPDATE CASCADE,
-                           CONSTRAINT `buttons_permissions_name_fk` FOREIGN KEY (`permission`) REFERENCES `permissions` (`name`) ON DELETE SET NULL ON UPDATE CASCADE
+                           CONSTRAINT `buttons_permissions_name_fk` FOREIGN KEY (`permission`) REFERENCES `permissions` (`name`) ON DELETE SET NULL ON UPDATE CASCADE,
+                           CONSTRAINT `buttons_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -171,7 +182,7 @@ CREATE TABLE `camera_logs` (
                                KEY `camera_log_time_index` (`time`),
                                CONSTRAINT `camera_log_cameras_name_id_fk` FOREIGN KEY (`camera_name_id`) REFERENCES `cameras` (`name_id`) ON DELETE CASCADE ON UPDATE CASCADE,
                                CONSTRAINT `camera_log_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=143088 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=549718 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,6 +233,7 @@ CREATE TABLE `dockontrol_nodes` (
                                     `last_command_executed_time` datetime DEFAULT NULL,
                                     `status` enum('online','pingable','offline','invalid_api_secret') NOT NULL DEFAULT 'offline',
                                     `ping` float(6,2) DEFAULT NULL,
+                                    `last_ping_time` datetime DEFAULT NULL,
                                     `dockontrol_node_version` varchar(63) DEFAULT '',
                                     `api_secret` varchar(255) NOT NULL,
                                     `last_monitor_check_time` datetime DEFAULT NULL,
@@ -262,7 +274,7 @@ CREATE TABLE `groups` (
                           `id` int(11) NOT NULL AUTO_INCREMENT,
                           `name` varchar(255) NOT NULL,
                           PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -282,7 +294,7 @@ CREATE TABLE `guests` (
                           UNIQUE KEY `guests_hash_uindex` (`hash`),
                           KEY `guests_users_id_fk` (`user_id`),
                           CONSTRAINT `guests_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -303,7 +315,7 @@ CREATE TABLE `login_logs` (
                               PRIMARY KEY (`id`),
                               KEY `login_logs_users_id_fk` (`user_id`),
                               CONSTRAINT `login_logs_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3895 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=17742 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -324,7 +336,7 @@ CREATE TABLE `login_logs_failed` (
                                      KEY `login_logs_failed_ip_index` (`ip`),
                                      KEY `login_logs_failed_time_index` (`time`),
                                      KEY `login_logs_failed_username_index` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=211 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=432 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -367,7 +379,7 @@ CREATE TABLE `nuki_logs` (
                              KEY `nuki_logs_status_index` (`status`),
                              KEY `nuki_logs_time_index` (`time`),
                              CONSTRAINT `nuki_logs_nuki_id_fk` FOREIGN KEY (`nuki_id`) REFERENCES `nuki` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=215 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=522 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -447,7 +459,7 @@ CREATE TABLE `users` (
                          `created_by` int(11) NOT NULL DEFAULT 1,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `users_username_uindex` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -467,7 +479,7 @@ CREATE TABLE `webauthn_registrations` (
                                           PRIMARY KEY (`id`),
                                           KEY `webauthn_registrations_users_id_fk` (`user_id`),
                                           CONSTRAINT `webauthn_registrations_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -479,4 +491,4 @@ CREATE TABLE `webauthn_registrations` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-10-09 15:48:40
+-- Dump completed on 2021-04-19 22:09:53

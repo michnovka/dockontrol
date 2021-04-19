@@ -89,7 +89,6 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 
 					$status = $reply['status'];
 					$message = $reply['message'];
-
 				}
 
 				$db->query('INSERT INTO nuki_logs SET time=NOW(), nuki_id=#, status=?, action=?', $nuki['id'], $status == 'ok' ? 'ok' : 'error', $action == 'lock' ? 'lock' : 'unlock');

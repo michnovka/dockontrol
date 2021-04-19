@@ -23,7 +23,7 @@ if(!empty($_POST['action'])){
 		$error = array();
 
 		// check for username
-		if(!preg_match('/^([a-z0-9]{4,32})$/i',$_POST['username'])){
+		if(!preg_match('/^([a-z0-9\.]{4,32})$/i',$_POST['username'])){
 			$error['username'] = 'Invalid username';
 		}elseif($db->fetch('SELECT 1 FROM users WHERE username=?', $_POST['username'])){
 			$error['username'] = 'Username taken';

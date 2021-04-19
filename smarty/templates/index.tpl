@@ -25,7 +25,7 @@
         <div class="uk-width-1-1"><h4 class="uk-h4">Gates</h4></div>
 
         {section name=g loop=$gates}
-            {if $permissions[$gates[g].permission]}
+            {if !$gates[g].permission || $permissions[$gates[g].permission]}
                 <div class="uk-width-1-2@l"><button id="{$gates[g].action}_options" type="button" class="garage_gate_modal uk-button uk-button-large uk-button-{if $gates[g].button_style == 'blue'}primary{elseif $gates[g].button_style == 'red'}danger{else}default{/if} uk-width-1-1"><div class="single_open">{$gates[g].name}{if $name_conflicts[$gates[g].name] > 1} {$gates[g].name_specification}{/if}</div>{if $gates[g].camera1}<div class="camera"><img src="/resources/images/security-camera.svg" width="40" data-camera1="{$gates[g].camera1}" data-camera2="{$gates[g].camera2}"{if $gates[g].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
             {/if}
         {/section}
@@ -33,14 +33,21 @@
         <div class="uk-width-1-1"><h4 class="uk-h4">Entrances</h4></div>
 
         {section name=e loop=$entrances}
-            {if $permissions[$entrances[e].permission]}
+            {if !$entrances[e].permission || $permissions[$entrances[e].permission]}
                 <div class="uk-width-1-3@l"><button id="{$entrances[e].action}_options" type="button" class="garage_gate_modal entrance uk-button uk-button-large uk-button-{if $entrances[e].button_style == 'blue'}primary{elseif $entrances[e].button_style == 'red'}danger{else}default{/if} uk-width-1-1"><div class="single_open">{$entrances[e].name}{if $name_conflicts[$entrances[e].name] > 1} {$entrances[e].name_specification}{/if}</div>{if $entrances[e].camera1}<div class="camera"><img src="/resources/images/security-camera.svg" width="40" data-camera1="{$entrances[e].camera1}" data-camera2="{$entrances[e].camera2}"{if $entrances[e].allow_1min_open} data-allow1min="1"{/if} /></div>{/if}</button></div>
             {/if}
         {/section}
 
         {section name=el loop=$elevators}
-            {if $permissions[$elevators[el].permission]}
+            {if !$elevators[el].permission || $permissions[$elevators[el].permission]}
                 <div class="uk-width-1-3@l"><button name="action" id="{$elevators[el].action}" type="button" class="uk-button uk-button-large uk-button-{if $elevators[el].button_style == 'blue'}primary{elseif $elevators[el].button_style == 'red'}danger{else}default{/if} uk-width-1-1 clickable" value="unlock_{$elevators[el].id}">{$elevators[el].name}{if $name_conflicts[$elevators[el].name] > 1} {$elevators[el].name_specification}{/if}</button></div>
+            {/if}
+        {/section}
+
+
+        {section name=m loop=$multi}
+            {if !$multi[m].permission || $permissions[$multi[m].permission]}
+                <div class="uk-width-1-3@l"><button id="multi_{$multi[m].id}_options" data-action-multi="{$multi[m].action_multi}" data-action-multi-description="{$multi[m].action_multi_description}" type="button" class="garage_gate_modal multi uk-button uk-button-large uk-button-{if $multi[m].button_style == 'blue'}primary{elseif $multi[m].button_style == 'red'}danger{else}default{/if} uk-width-1-1"><div class="multi_open">{$multi[m].name}{if $name_conflicts[$multi[m].name] > 1} {$multi[m].name_specification}{/if}</div><div class="camera"><img src="/resources/images/security-camera.svg" width="40" data-camera1="{$multi[m].camera1}" data-camera2="{$multi[m].camera2}" data-camera3="{$multi[m].camera3}" data-camera4="{$multi[m].camera4}" /></div></button></div>
             {/if}
         {/section}
 
@@ -107,8 +114,15 @@
                         <div class="paused_container"><img src="/resources/images/pause.svg" width="80" /></div>
                     </div>
                 {/if}
+
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_dummy_button" type="button" class="open_garage_gate_dummy_button uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">SINGLE OPEN</button></div>
                 <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_1min_dummy_button" type="button" class="open_garage_gate_1min_dummy_button uk-button uk-button-large uk-button-danger uk-width-1-1 clickable clickable_modal" value="">OPEN FOR 1 MIN</button></div>
+
+                <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_multi_dummy_button1" type="button" class="open_garage_gate_multi_dummy_button open_garage_gate_multi_dummy_button1 uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">ACTION1</button></div>
+                <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_multi_dummy_button2" type="button" class="open_garage_gate_multi_dummy_button open_garage_gate_multi_dummy_button2 uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">ACTION2</button></div>
+                <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_multi_dummy_button3" type="button" class="open_garage_gate_multi_dummy_button open_garage_gate_multi_dummy_button3 uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">ACTION3</button></div>
+                <div class="uk-width-1-2@l"><button name="action" id="open_garage_gate_multi_dummy_button4" type="button" class="open_garage_gate_multi_dummy_button open_garage_gate_multi_dummy_button4 uk-button uk-button-large uk-button-primary uk-width-1-1 clickable clickable_modal" value="">ACTION4</button></div>
+
             </div>
         </div>
     </div>

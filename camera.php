@@ -1,6 +1,5 @@
 <?php
 
-
 require_once dirname(__FILE__).'/libs/config.php';
 require_once dirname(__FILE__).'/libs/api_libs.php';
 require_once dirname(__FILE__).'/libs/fetch_camera_picture.php';
@@ -34,9 +33,17 @@ if(!empty($_GET['username'])){
 
 $camera1 = $_GET['camera'];
 $camera2 = null;
+$camera3 = null;
+$camera4 = null;
 
 if(!empty($_GET['camera2']))
 	$camera2 = $_GET['camera2'];
+
+if(!empty($_GET['camera3']))
+	$camera3 = $_GET['camera3'];
+
+if(!empty($_GET['camera4']))
+	$camera4 = $_GET['camera4'];
 
 if(!$user['has_camera_access']){
 	echo 'Not authorized';
@@ -59,6 +66,26 @@ if(!empty($camera2)) {
 	$cameras[2] = $db->queryfirst($camera_sql, $camera2);
 
 	if(!_check_permission($cameras[2]['permission_required'], $user)){
+		echo 'Not authorized';
+		exit;
+	}
+
+}
+
+if(!empty($camera3)) {
+	$cameras[3] = $db->queryfirst($camera_sql, $camera3);
+
+	if(!_check_permission($cameras[3]['permission_required'], $user)){
+		echo 'Not authorized';
+		exit;
+	}
+
+}
+
+if(!empty($camera4)) {
+	$cameras[4] = $db->queryfirst($camera_sql, $camera4);
+
+	if(!_check_permission($cameras[4]['permission_required'], $user)){
 		echo 'Not authorized';
 		exit;
 	}
@@ -99,19 +126,56 @@ foreach ($cameras as $camera_i => $camera) {
 
 }
 
-if(!empty($cameras[2]['photo_data'])){
+if(!empty($cameras[4]['photo_data'])){
 
+	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
+	list($width, $height, $type, $attr) =  getimagesizefromstring($cameras[1]['photo_data']);
+
+	$thumb = imagecreatetruecolor($width*2, $height*2);
+	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
+	$img2 = imagecreatefromstring($cameras[2]['photo_data']);
+	$img3 = imagecreatefromstring($cameras[3]['photo_data']);
+	$img4 = imagecreatefromstring($cameras[4]['photo_data']);
+
+	imagecopy($thumb, $img1, 0, 0, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	imagecopy($thumb, $img2, $width, 0, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	imagecopy($thumb, $img3, 0, $height, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	imagecopy($thumb, $img4, $width, $height, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	header('Content-type: image/jpeg');
+
+	imagejpeg($thumb);
+	exit;
+
+}elseif(!empty($cameras[3]['photo_data'])){
+
+	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
+	list($width, $height, $type, $attr) =  getimagesizefromstring($cameras[1]['photo_data']);
+
+	$thumb = imagecreatetruecolor($width, $height*3);
+	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
+	$img2 = imagecreatefromstring($cameras[2]['photo_data']);
+	$img3 = imagecreatefromstring($cameras[3]['photo_data']);
+
+	imagecopy($thumb, $img1, 0, 0, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	imagecopy($thumb, $img2, 0, $height, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	imagecopy($thumb, $img3, 0, $height*2, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	header('Content-type: image/jpeg');
+
+	imagejpeg($thumb);
+	exit;
+
+}elseif(!empty($cameras[2]['photo_data'])){
 	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
 	list($width, $height, $type, $attr) =  getimagesizefromstring($cameras[1]['photo_data']);
 
 	$thumb = imagecreatetruecolor($width, $height*2);
 	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
 	$img2 = imagecreatefromstring($cameras[2]['photo_data']);
-
+	
 	imagecopy($thumb, $img1, 0, 0, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
 	imagecopy($thumb, $img2, 0, $height, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
 	header('Content-type: image/jpeg');
-
+	
 	imagejpeg($thumb);
 	exit;
 

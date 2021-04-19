@@ -236,7 +236,7 @@
             padding-right: 0;
         }
 
-        button.garage_gate_modal div.single_open{
+        button.garage_gate_modal div.single_open,button.garage_gate_modal div.multi_open{
             width: 75%; float: left;
         }
 

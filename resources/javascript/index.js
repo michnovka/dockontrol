@@ -82,7 +82,6 @@ function newregistration(pin, nuki_id, callback) {
     });
 }
 
-
 /**
  * checks a FIDO2 registration
  * @returns {undefined}
@@ -132,6 +131,7 @@ function checkregistration(nuki_id, callback, callbackFailure) {
 
         // convert to json
     }).then(function(response) {
+
         return response.json();
 
         // analyze response
@@ -510,32 +510,81 @@ function setUpHooksCamera(element){
 
         var button_element = $(this).parent();
         var button_id = button_element.attr('id');
-
+        var cameraContainer = $(this);
+        if(cameraContainer.hasClass('multi_open')){
+            cameraContainer = cameraContainer.parent().parent().find('div.camera');
+        }
         var new_button_id = button_id.replace(/_options/g,'');
 
-        var img_element = $(this).find('img');
+        var img_element = $(cameraContainer).find('img');
 
         var camera1_id = img_element.data('camera1');
         var camera2_id = img_element.data('camera2');
+        var camera3_id = img_element.data('camera3');
+        var camera4_id = img_element.data('camera4');
 
         var allow_1min_open = img_element.data('allow1min');
 
         // set also originalId data because a JS timeout can be set to update it later to non-up-to-date value
         $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button').attr('id', new_button_id).data('originalId', new_button_id);
 
+        var button_open_element = $(open_garage_gate_modal).find('button.open_garage_gate_dummy_button');
         var button_open_1min_element = $(open_garage_gate_modal).find('button.open_garage_gate_1min_dummy_button');
+
+        var button_multi_action1_element = $(open_garage_gate_modal).find('button.open_garage_gate_multi_dummy_button1');
+        var button_multi_action2_element = $(open_garage_gate_modal).find('button.open_garage_gate_multi_dummy_button2');
+        var button_multi_action3_element = $(open_garage_gate_modal).find('button.open_garage_gate_multi_dummy_button3');
+        var button_multi_action4_element = $(open_garage_gate_modal).find('button.open_garage_gate_multi_dummy_button4');
+
 
         $(open_garage_gate_modal).find('h2#open_garage_gate_modal_title').text('Open ' + $(this).parent().find('div.single_open').text());
 
-        picture_element.attr('src', '/resources/images/loading.jpg').attr('src', 'camera.php?camera='+camera1_id+(!!camera2_id ? '&camera2='+camera2_id : '')+'&now'+Date.now());
+        picture_element.attr('src', '/resources/images/loading.jpg').attr('src', 'camera.php?camera='+camera1_id+(!!camera2_id ? '&camera2='+camera2_id : '')+(!!camera3_id ? '&camera3='+camera3_id : '')+(!!camera4_id ? '&camera4='+camera4_id : '')+'&now'+Date.now());
         picture_element.parent().find('.paused_container').hide();
 
         startPictureInterval();
 
-        if(!!allow_1min_open){
-            button_open_1min_element.show().attr('id', new_button_id+'_1min').data('originalId', new_button_id+'_1min');
-        }else{
-            button_open_1min_element.hide();
+        if(button_element.hasClass('multi')) {
+            var action_multi = button_element.data('action-multi').split(',');
+            var action_multi_description = button_element.data('action-multi-description').split(',');
+
+            button_open_element.parent().hide();
+            button_open_1min_element.parent().hide();
+
+            if(!!action_multi[0])
+                button_multi_action1_element.text(action_multi_description[0]).attr('id',action_multi[0]).parent().show();
+            else
+                button_multi_action1_element.parent().hide();
+
+            if(!!action_multi[1])
+                button_multi_action2_element.text(action_multi_description[1]).attr('id',action_multi[1]).parent().show();
+            else
+                button_multi_action2_element.parent().hide();
+
+            if(!!action_multi[2])
+                button_multi_action3_element.text(action_multi_description[2]).attr('id',action_multi[2]).parent().show();
+            else
+                button_multi_action3_element.parent().hide();
+
+            if(!!action_multi[3])
+                button_multi_action4_element.text(action_multi_description[3]).attr('id',action_multi[3]).parent().show();
+            else
+                button_multi_action4_element.parent().hide();
+
+        }else {
+            button_multi_action1_element.parent().hide();
+            button_multi_action2_element.parent().hide();
+            button_multi_action3_element.parent().hide();
+            button_multi_action4_element.parent().hide();
+
+            button_open_element.parent().show();
+
+            if (!!allow_1min_open) {
+                button_open_1min_element.parent().show();
+                button_open_1min_element.attr('id', new_button_id + '_1min').data('originalId', new_button_id + '_1min');
+            } else {
+                button_open_1min_element.parent().hide();
+            }
         }
 
         var modal = UIkit.modal(open_garage_gate_modal);
@@ -698,6 +747,7 @@ $(document).ready(function(){
 
     setUpHooks('button.clickable,button.garage_gate_modal div.single_open');
     setUpHooksCamera('button.garage_gate_modal div.camera');
+    setUpHooksCamera('button.garage_gate_modal div.multi_open');
 
     $('div.picture_container').click(function () {
         var imageElement = $(this).find('img.open_garage_gate_modal_camera_picture');

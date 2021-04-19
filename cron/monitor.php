@@ -16,7 +16,7 @@ foreach($nodes as $node){
 	$status = 'offline';
 
 	// ping
-	$ping = `ping -W 1 -c 4 $ip | tail -1| awk '{print $4}' | cut -d '/' -f 2`;
+	$ping = trim(`ping -W 1 -c 4 $ip | tail -1| awk '{print $4}' | cut -d '/' -f 2`);
 
 	if($ping){
 		$status = 'pingable';

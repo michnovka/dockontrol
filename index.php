@@ -77,13 +77,16 @@ $smarty->assign('user', $user);
 $smarty->assign('permissions', _get_permissions($user['id'], !array_key_exists('admin', $_GET)));
 
 $gates = array();
-$db->queryall('SELECT * FROM buttons WHERE type=\'gate\' ORDER BY sort_index', $gates);
+$db->queryall('SELECT * FROM buttons WHERE type=\'gate\' AND (user_id=# OR user_id IS NULL) ORDER BY sort_index', $gates,'', $user['id']);
 
 $entrances = array();
-$db->queryall('SELECT * FROM buttons WHERE type=\'entrance\' ORDER BY sort_index', $entrances);
+$db->queryall('SELECT * FROM buttons WHERE type=\'entrance\' AND (user_id=# OR user_id IS NULL) ORDER BY sort_index', $entrances,'', $user['id']);
 
 $elevators = array();
-$db->queryall('SELECT * FROM buttons WHERE type=\'elevator\' ORDER BY sort_index', $elevators);
+$db->queryall('SELECT * FROM buttons WHERE type=\'elevator\' AND (user_id=# OR user_id IS NULL) ORDER BY sort_index', $elevators,'', $user['id']);
+
+$multi = array();
+$db->queryall('SELECT * FROM buttons WHERE type=\'multi\' AND (user_id=# OR user_id IS NULL) ORDER BY sort_index', $multi,'', $user['id']);
 
 
 $nuki = array();
@@ -108,9 +111,15 @@ foreach($elevators as $row){
 		$name_conflicts[$row['name']]++;
 }
 
+foreach($multi as $row){
+	if(_check_permission($row['permission']))
+		$name_conflicts[$row['name']]++;
+}
+
 $smarty->assign('gates', $gates);
 $smarty->assign('entrances', $entrances);
 $smarty->assign('elevators', $elevators);
+$smarty->assign('multi', $multi);
 
 $smarty->assign('name_conflicts', $name_conflicts);
 

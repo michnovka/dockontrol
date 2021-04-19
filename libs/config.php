@@ -1,6 +1,6 @@
 <?php
 
-define('DOCKONTROL_VERSION', '2020.10.09.1');
+define('DOCKONTROL_VERSION', '2021.04.19.1');
 
 require_once dirname(__FILE__).'/lib_db4.php';
 require_once dirname(__FILE__).'/lib_password.php';
@@ -52,6 +52,9 @@ function _add_to_action_queue($action, $user_id, $time_start_unixtime, $guest_id
 function _check_permission($permission, $user = null)
 {
 	global $db;
+	
+	if(empty($permission))
+		return true;
 
 	if(!empty($user)){
 		_get_permissions($user['id'], false);

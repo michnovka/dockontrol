@@ -50,6 +50,49 @@
         </div>
     </form>
 
+
+    <div class="uk-grid-small uk-text-center uk-grid-row-small uk-margin-top" uk-grid>
+        <div class="uk-width-1-1"><h4 class="uk-h4">Phone control</h4></div>
+
+        <p>Add your whitelisted numbers below and then save <strong>{$_PHONE_CONTROL_NUMBER}</strong> as the Phone Gateway number. When you call, it will immediately hang up and open both garage and gate. If you do not whitelist your number, it will ring indefinitely and do nothing.</p>
+
+        <table class="uk-table uk-table-striped uk-table-hover uk-table-small">
+            <thead>
+            <tr>
+                <th>Phone</th>
+                <th>Time added</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {section name=pc loop=$phone_controls}
+                <tr>
+                    <td>+{$phone_controls[pc].phone}</td>
+                    <td>{$phone_controls[pc].time_added}</td>
+                    <td>
+                        <form action="settings.php" method="post">
+                            <button class="uk-button uk-button-default uk-button-small" type="submit" title="Remove">Remove</button>
+                            <input type="hidden" name="action" value="remove_phone_control" />
+                            <input type="hidden" name="phone_control_id" value="{$phone_controls[pc].id}" />
+                        </form>
+                    </td>
+                </tr>
+            {/section}
+            <form action="settings.php" method="post">
+                <tr>
+                    <td><input type="tel" class="uk-input uk-width-1-1" value="" placeholder="Phone with prefix" name="phone" /></td>
+                    <td></td>
+                    <td>
+                        <button class="uk-button uk-button-default" type="submit" title="Add">Add</button>
+                        <input type="hidden" name="action" value="add_phone_control" />
+                    </td>
+                </tr>
+            </form>
+            </tbody>
+        </table>
+
+    </div>
+
     <form action="settings.php" method="post">
         <div class="uk-grid-small uk-text-center uk-grid-row-small uk-margin-top" uk-grid>
             <div class="uk-width-1-1"><h4 class="uk-h4">Other settings</h4></div>

@@ -1,11 +1,13 @@
 <?php
 
-define('DOCKONTROL_VERSION', '2021.04.19.1');
+define('DOCKONTROL_VERSION', '2021.05.29.1');
 
 require_once dirname(__FILE__).'/lib_db4.php';
 require_once dirname(__FILE__).'/lib_password.php';
 require_once(dirname(__FILE__).'/../smarty/libs/Smarty.class.php');
-
+require_once(dirname(__FILE__).'/../config/API_SECRET.php');
+require_once(dirname(__FILE__).'/../config/phone_control_config.php');
+require_once(dirname(__FILE__).'/../config/cron_config.php');
 
 error_reporting(0);
 ini_set('display_errors', '0');

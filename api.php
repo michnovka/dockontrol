@@ -5,7 +5,6 @@ set_time_limit(0);
 require_once(dirname(__FILE__).'/libs/config.php');
 require_once(dirname(__FILE__).'/libs/api_libs.php');
 require_once(dirname(__FILE__).'/libs/process_action.php');
-require_once(dirname(__FILE__).'/config/API_SECRET.php');
 
 /** @var Database4 $db */
 /** @var string $_SECRET */
@@ -21,8 +20,17 @@ $password = !empty($_POST['password']) ? $_POST['password'] : (!empty($_GET['pas
 $duration = !empty($_POST['duration']) ? $_POST['duration'] : (!empty($_GET['duration']) ? $_GET['duration'] : null);
 $pause = !empty($_POST['pause']) ? $_POST['pause'] : (!empty($_GET['pause']) ? $_GET['pause'] : null);
 $channel = !empty($_POST['channel']) ? $_POST['channel'] : (!empty($_GET['channel']) ? $_GET['channel'] : null);
+$hash = !empty($_POST['hash']) ? $_POST['hash'] : (!empty($_GET['hash']) ? $_GET['hash'] : null);
 
-if(!empty($secret)){
+if(!empty($hash)){
+	$api_action = 'phone_control';
+	
+	if(hash('sha256', $_POST['caller_number'].'|'.$_POST['time'].'|'.$_PHONE_CONTROL_SECRET) == $hash) {
+		$authentication_error = false;
+	}else{
+		$authentication_error = "Phone control authentication error";
+	}
+}elseif(!empty($secret)){
 	if($secret == $_SECRET) {
 		$authentication_error = false;
 	}else{
@@ -47,6 +55,31 @@ if($authentication_error){
 $reply = array();
 
 switch ($api_action){
+	case 'phone_control':
+		// fetch user by phone
+		$phone = preg_replace("/[^0-9]/", '', $_POST['caller_number']);
+		
+		$user = $db->queryfirst('SELECT u.* FROM phone_control p INNER JOIN users u on p.user_id = u.id WHERE p.phone = # LIMIT 1', $phone);
+		
+		if(!empty($user)){
+			$reply['action'] = 'hung-up';
+			// open garage, gate, garage
+			
+			
+			if(!defined('_IS_API'))
+				define('_IS_API', true);
+			
+			$gate_rw = getRWFromGarage($user['default_garage']);
+			
+			_add_to_action_queue('open_garage_'.$user['default_garage'], $user['id'], time());
+			_add_to_action_queue('open_gate_rw'.$gate_rw, $user['id'], time()+5);
+			_add_to_action_queue('open_garage_'.$user['default_garage'], $user['id'], time()+10);
+			
+		}
+		
+		$db->query('INSERT INTO phone_control_log SET user_id='.(!empty($user) ? intval($user['id']) : 'NULL' ).', time=NOW(), phone=#', $phone);
+		
+		break;
 	case 'local_relay':
 		$channel = intval($channel);
 

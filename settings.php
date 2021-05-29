@@ -55,6 +55,44 @@ if(!empty($_POST['action'])) {
 			$db->query('UPDATE users SET geolocation_enabled = # WHERE id= #', $_POST['geolocation_enabled'] ? 1 : 0, $user['id']);
 			$smarty->assign('success', 'Settings saved');
 			break;
+			
+		case 'add_phone_control':
+			// check phone
+			
+			$error = '';
+			
+			//eliminate every char except 0-9
+			$phone = preg_replace("/[^0-9]/", '', $_POST['phone']);
+			
+			if (strlen($phone) < 9){
+				$error .= "Invalid phone. ";
+			}
+			
+			// check if another user has this phone
+			if($db->fetch('SELECT 1 FROM phone_control WHERE phone=#', $phone)){
+				$error .= 'Phone already in use.';
+			}
+			
+			if(empty($error)){
+				try {
+					$db->query('INSERT INTO phone_control SET user_id=#, phone=#, time_added = NOW()', $user['id'], $phone);
+					$smarty->assign('success', 'Phone added');
+				}catch (EDatabase $e){
+					$error = 'Unknown error';
+				}
+			}
+			
+			if(!empty($error)){
+				$smarty->assign('error', $error);
+			}
+			
+			break;
+		case 'remove_phone_control':
+			
+			$db->query('DELETE FROM phone_control WHERE id=# AND user_id=#', $_POST['phone_control_id'], $user['id']);
+			$smarty->assign('success', 'Phone removed');
+			
+			break;
 	}
 
 }
@@ -67,6 +105,14 @@ $smarty->assign('permissions', _get_permissions());
 $nukis = array();
 $db->queryall('SELECT * FROM nuki WHERE user_id=#', $nukis,'', $user['id']);
 $smarty->assign('nukis', $nukis);
+
+
+$phone_controls = array();
+$db->queryall('SELECT * FROM phone_control WHERE user_id=#', $phone_controls,'', $user['id']);
+$smarty->assign('phone_controls', $phone_controls);
+
+
+$smarty->assign('_PHONE_CONTROL_NUMBER', $_PHONE_CONTROL_NUMBER);
 
 $smarty->display('settings.tpl');
 

@@ -112,7 +112,27 @@ switch ($api_action){
 			$db->queryall('SELECT * FROM buttons ORDER BY `type`="gate" DESC, `type`="entrance" DESC, `type`="elevator" DESC, sort_index', $buttons);
 
 			if(!empty($buttons)) {
-
+				
+				$reply['allowed_actions'][] = array(
+					'id' => -2,
+					'action' => 'enter',
+					'type' => 'carenter',
+					'name' => 'Car Enter',
+					'has_camera' => false,
+					'allow_widget' => true,
+					'allow_1min_open' => false,
+				);
+				
+				$reply['allowed_actions'][] = array(
+					'id' => -1,
+					'action' => 'exit',
+					'type' => 'carexit',
+					'name' => 'Car Exit',
+					'has_camera' => false,
+					'allow_widget' => true,
+					'allow_1min_open' => false,
+				);
+				
 				$name_conflicts = array();
 
 				foreach($buttons as $button){
@@ -123,14 +143,28 @@ switch ($api_action){
 				foreach ($buttons as $button) {
 					if ($permissions[$button['permission']]) {
 
-						$reply['allowed_actions'][] = array(
+						$row = array(
 							'id' => $button['id'],
 							'action' => $button['action'],
 							'type' => $button['type'],
 							'name' => $button['name'].($name_conflicts[$button['name']] > 1 ? ' '.$button['name_specification'] : ''),
 							'has_camera' => !empty($button['camera1']),
 							'allow_widget' => true,
+							'allow_1min_open' => $button['allow_1min_open'] ? true : false,
 						);
+						
+						if($row['has_camera']) {
+							$row['cameras'] = [];
+							
+							$row['cameras'][] = $button['camera1'];
+
+							for($i = 2; $i <= 4; $i++) {
+								if (!empty($button['camera'.$i]))
+									$row['cameras'][] = $button['camera'.$i];
+							}
+						}
+						
+						$reply['allowed_actions'][] = $row;
 					}
 				}
 			}

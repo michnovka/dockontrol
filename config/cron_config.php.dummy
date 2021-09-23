@@ -1,9 +1,9 @@
 <?php
 
-$CRON_FONFIG = array();
-
-$CRON_FONFIG['login_logs_failed_timelife_days'] = 30;
-$CRON_FONFIG['login_logs_timelife_days'] = 30;
-$CRON_FONFIG['camera_logs_timelife_days'] = 30;
-$CRON_FONFIG['nuki_logs_timelife_days'] = 30;
-$CRON_FONFIG['webauthn_registrations_unused_timelife_days'] = 30;
+const CRON_CONFIG = [
+	'login_logs_failed_timelife_days' => 30,
+	'login_logs_timelife_days' => 30,
+	'camera_logs_timelife_days' => 30,
+	'nuki_logs_timelife_days' => 30,
+	'webauthn_registrations_unused_timelife_days' => 30,
+];

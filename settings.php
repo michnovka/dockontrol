@@ -2,6 +2,9 @@
 
 require_once dirname(__FILE__).'/libs/config.php';
 
+/** @var Database4 $db */
+/** @var Smarty $smarty */
+
 //error_reporting(E_ALL);
 //ini_set('display_errors','1');
 
@@ -112,8 +115,6 @@ $db->queryall('SELECT * FROM phone_control WHERE user_id=#', $phone_controls,'',
 $smarty->assign('phone_controls', $phone_controls);
 
 
-$smarty->assign('_PHONE_CONTROL_NUMBER', $_PHONE_CONTROL_NUMBER);
+$smarty->assign('_PHONE_CONTROL_NUMBER', PHONE_CONTROL_NUMBER);
 
 $smarty->display('settings.tpl');
-
-?>

@@ -1,10 +1,11 @@
 <?php
 
-define('DOCKONTROL_VERSION', '2021.05.29.1');
+const DOCKONTROL_VERSION = '2021.09.24.1';
 
 require_once dirname(__FILE__).'/lib_db4.php';
 require_once dirname(__FILE__).'/lib_password.php';
 require_once(dirname(__FILE__).'/../smarty/libs/Smarty.class.php');
+require_once(dirname(__FILE__).'/../config/database.php');
 require_once(dirname(__FILE__).'/../config/API_SECRET.php');
 require_once(dirname(__FILE__).'/../config/phone_control_config.php');
 require_once(dirname(__FILE__).'/../config/cron_config.php');
@@ -27,7 +28,7 @@ if(
 )
 	$smarty->assign('__samsung_watch', true);
 
-$db = new Database4('localhost', 'dock', 'ObamaIsNotOsama!', 'dock', 'mysqli');
+$db = new Database4(DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME, DATABASE_TYPE);
 
 /**
  * @param string $action

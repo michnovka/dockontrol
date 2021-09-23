@@ -7,7 +7,6 @@ require_once(dirname(__FILE__).'/libs/api_libs.php');
 require_once(dirname(__FILE__).'/libs/process_action.php');
 
 /** @var Database4 $db */
-/** @var string $_SECRET */
 
 $authentication_error = "Authentication error";
 $api_action = 'local_relay';
@@ -25,13 +24,13 @@ $hash = !empty($_POST['hash']) ? $_POST['hash'] : (!empty($_GET['hash']) ? $_GET
 if(!empty($hash)){
 	$api_action = 'phone_control';
 	
-	if(hash('sha256', $_POST['caller_number'].'|'.$_POST['time'].'|'.$_PHONE_CONTROL_SECRET) == $hash) {
+	if(hash('sha256', $_POST['caller_number'].'|'.$_POST['time'].'|'.PHONE_CONTROL_SECRET) == $hash) {
 		$authentication_error = false;
 	}else{
 		$authentication_error = "Phone control authentication error";
 	}
 }elseif(!empty($secret)){
-	if($secret == $_SECRET) {
+	if($secret == API_SECRET) {
 		$authentication_error = false;
 	}else{
 		$authentication_error = "Local relay authentication error";
@@ -209,5 +208,6 @@ switch ($api_action){
 		break;
 }
 
+header('Content-type: text/json');
 echo json_encode($reply);
 exit;

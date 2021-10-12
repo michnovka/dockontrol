@@ -173,9 +173,10 @@ if(!empty($cameras[4]['photo_data'])){
 	$thumb = imagecreatetruecolor($width, $height*2);
 	$img1 = imagecreatefromstring($cameras[1]['photo_data']);
 	$img2 = imagecreatefromstring($cameras[2]['photo_data']);
+	list($width2, $height2, $type2, $attr2) =  getimagesizefromstring($cameras[2]['photo_data']);
 	
 	imagecopy($thumb, $img1, 0, 0, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
-	imagecopy($thumb, $img2, 0, $height, 0, 0, $width, $height); //have to play with these numbers for it to work for you, etc.
+	imagecopyresized($thumb, $img2, 0, $height, 0, 0, $width, $height, $width2, $height2); //have to play with these numbers for it to work for you, etc.
 	header('Content-type: image/jpeg');
 	
 	imagejpeg($thumb);

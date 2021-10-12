@@ -1,6 +1,6 @@
 <?php
 
-const DOCKONTROL_VERSION = '2021.09.24.1';
+const DOCKONTROL_VERSION = '2021.10.12.1';
 
 require_once dirname(__FILE__).'/lib_db4.php';
 require_once dirname(__FILE__).'/lib_password.php';

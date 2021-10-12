@@ -120,6 +120,7 @@ switch ($api_action){
 					'has_camera' => false,
 					'allow_widget' => true,
 					'allow_1min_open' => false,
+					'icon' => 'enter',
 				);
 				
 				$reply['allowed_actions'][] = array(
@@ -130,6 +131,7 @@ switch ($api_action){
 					'has_camera' => false,
 					'allow_widget' => true,
 					'allow_1min_open' => false,
+					'icon' => 'exit',
 				);
 				
 				$name_conflicts = array();
@@ -150,6 +152,7 @@ switch ($api_action){
 							'has_camera' => !empty($button['camera1']),
 							'allow_widget' => true,
 							'allow_1min_open' => $button['allow_1min_open'] ? true : false,
+							'icon' => $button['icon'],
 						);
 						
 						if($row['has_camera']) {
@@ -182,6 +185,7 @@ switch ($api_action){
 						'can_lock' => $nuki['can_lock'] ? true : false,
 						'has_camera' => false,
 						'allow_widget' => false,
+						'icon' => 'nuki',
 					);
 				}
 			}

@@ -12,14 +12,22 @@ $authentication_error = "Authentication error";
 $api_action = 'local_relay';
 $user = null;
 
-$secret = !empty($_POST['secret']) ? $_POST['secret'] : (!empty($_GET['secret']) ? $_GET['secret'] : null);
-$username = !empty($_POST['username']) ? $_POST['username'] : (!empty($_GET['username']) ? $_GET['username'] : null);
-$action = !empty($_POST['action']) ? $_POST['action'] : (!empty($_GET['action']) ? $_GET['action'] : null);
-$password = !empty($_POST['password']) ? $_POST['password'] : (!empty($_GET['password']) ? $_GET['password'] : null);
-$duration = !empty($_POST['duration']) ? $_POST['duration'] : (!empty($_GET['duration']) ? $_GET['duration'] : null);
-$pause = !empty($_POST['pause']) ? $_POST['pause'] : (!empty($_GET['pause']) ? $_GET['pause'] : null);
-$channel = !empty($_POST['channel']) ? $_POST['channel'] : (!empty($_GET['channel']) ? $_GET['channel'] : null);
-$hash = !empty($_POST['hash']) ? $_POST['hash'] : (!empty($_GET['hash']) ? $_GET['hash'] : null);
+function parseAPIParam($name){
+	return !empty($_POST[$name]) ? $_POST[$name] : (!empty($_GET[$name]) ? $_GET[$name] : null);
+}
+
+$secret = parseAPIParam('secret');
+$username = parseAPIParam('username');
+$action = parseAPIParam('action');
+$password = parseAPIParam('password');
+$duration = parseAPIParam('duration');
+$pause = parseAPIParam('pause');
+$channel = parseAPIParam('channel');
+$hash = parseAPIParam('hash');
+
+$totp = parseAPIParam('totp');
+$totp_nonce = parseAPIParam('totp_nonce');
+$pin = parseAPIParam('pin');
 
 if(!empty($hash)){
 	$api_action = 'phone_control';
@@ -64,21 +72,24 @@ switch ($api_action){
 			$reply['action'] = 'hung-up';
 			// open garage, gate, garage
 			
-			
 			if(!defined('_IS_API'))
 				define('_IS_API', true);
 			
 			$gate_rw = getRWFromGarage($user['default_garage']);
 			
-			_add_to_action_queue('open_garage_'.$user['default_garage'], $user['id'], time());
-			_add_to_action_queue('open_gate_rw'.$gate_rw, $user['id'], time()+5);
-			_add_to_action_queue('open_garage_'.$user['default_garage'], $user['id'], time()+10);
-			
+			try{
+				_add_to_action_queue('open_gate_rw'.$gate_rw, $user['id'], time());
+				_add_to_action_queue('open_garage_'.$user['default_garage'], $user['id'], time()+10);
+			} catch (EDatabase $e) {
+				$reply['status'] = 'error';
+				$reply['message'] = 'Database error';
+			}
 		}
 		
 		$db->query('INSERT INTO phone_control_log SET user_id='.(!empty($user) ? intval($user['id']) : 'NULL' ).', time=NOW(), phone=#', $phone);
 		
 		break;
+		
 	case 'local_relay':
 		$channel = intval($channel);
 
@@ -186,6 +197,7 @@ switch ($api_action){
 						'has_camera' => false,
 						'allow_widget' => false,
 						'icon' => 'nuki',
+						'nuki_pin_required' => !empty($nuki['pin']) ? true : false,
 					);
 				}
 			}
@@ -203,8 +215,8 @@ switch ($api_action){
 
 			if(!defined('_IS_API'))
 				define('_IS_API', true);
-
-			$reply = processAction($api_action, $user);
+			
+			$reply = processAction($api_action, $user, null, $totp, $totp_nonce, $pin);
 		} catch (EDatabase $e) {
 			$reply['status'] = 'error';
 			$reply['message'] = 'Database error';

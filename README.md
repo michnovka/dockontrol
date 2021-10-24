@@ -90,7 +90,11 @@ In order to function, a CRON must be set to process queue. A sample CRON is belo
 */5 * * * * php /var/www/html/cron/monitor.php
 ```
 
-### Disclaimer
+## Android and iOS applications
+
+There is a Flutter project for DOCKontrol apps for Android and iOS. The source code can be found at [michnovka/dockontrol-flutter-app](https://github.com/michnovka/dockontrol-flutter-app) repository. The app uses [api.php](api.php) to log in and also execute actions.
+
+## Disclaimer
 
 I honestly believe the security is sound, but I encourage everybody to properly review the code before using it with their NUKI devices. I am not responsible for any bugs that might be present, the software is provided in good faith as is, with no guarantees.
 
@@ -102,7 +106,7 @@ Special thanks to the contributors of these repos:
 - https://github.com/jiangts/JS-OTP
 - https://github.com/emn178/hi-base32
 
-### TODO
+## TODO
 
 Want to help? The following things are currently on my TODO and I will be grateful for any pull requests:
 

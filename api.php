@@ -105,6 +105,7 @@ switch ($api_action){
 
 		break;
 
+	case 'api_list':
 	case 'app_login':
 
 		try {
@@ -200,6 +201,20 @@ switch ($api_action){
 						'nuki_pin_required' => !empty($nuki['pin']) ? true : false,
 					);
 				}
+			}
+			
+			if($api_action == 'api_list'){
+				foreach ($reply['allowed_actions'] as $action){
+					if(!empty($action['action'])) {
+						echo $action['action'] . "\n";
+						
+						if($action['allow_1min_open'])
+							echo $action['action'] . "_1min\n";
+						
+					}
+				}
+				
+				exit;
 			}
 
 

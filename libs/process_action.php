@@ -110,6 +110,7 @@ function processAction($action, $user, $guest = null, $totp = null, $totp_nonce 
 
 					_add_to_action_queue('open_gate_rw'.$gate_rw, $user['id'], time(), $guest_id);
 					_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time() + 10, $guest_id);
+					_add_to_action_queue('open_garage_' . $user['default_garage'], $user['id'], time() + 15, $guest_id);
 					//sleep(1);
 
 					if (_check_permission('elevator_z9b2', $user) && $user['apartment'] == 'Z9.B2.501') {

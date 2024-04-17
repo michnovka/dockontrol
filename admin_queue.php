@@ -18,7 +18,7 @@ $limit = 20;
 if(
 	!empty($_GET['limit']) && 
 	intval($_GET['limit']) > 0 &&
-	intval($_GET['limit']) < 1000
+	intval($_GET['limit']) <= 10000
 ){
 	$limit = intval($_GET['limit']);
 }
